@@ -3,7 +3,7 @@ project(CourseProject)
 cmake_minimum_required(VERSION 3.11)
 
 set(SOURCES ActivateFunction.cpp)
-set(HEADERS ActivateFunction.h Matrix.h)
+set(HEADERS ActivateFunction.h Matrix.h Layer.h Net.h)
 add_library(lib STATIC ${SOURCES} ${HEADERS})
 
 add_executable(CourseProject main.cpp ${SOURCES})

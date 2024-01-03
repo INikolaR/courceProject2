@@ -1,3 +1,5 @@
+#pragma once
+
 class ActivateFunction {
 public:
     static double evaluate0(double value);

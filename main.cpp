@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ActivateFunction.h"
 #include "Matrix.h"
+#include "Layer.h"
 
 int main() {
     std::cout << ActivateFunction::evaluate0(5) << " " << ActivateFunction::evaluate1(5) << std::endl;
