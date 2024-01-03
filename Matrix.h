@@ -31,6 +31,26 @@ public:
     std::pair<std::size_t, std::size_t> size() const {
         return std::make_pair(N, M);
     }
+
+    Matrix<M, N> transposed() {
+        Matrix<M, N> transposed = Matrix<M, N>();
+        for (std::size_t i = 0; i < N; ++i) {
+            for (std::size_t j = 0; j < M; ++j) {
+                transposed[j][i] = *this[i][j];
+            }
+        }
+        return transposed;
+    }
+
+    Matrix<N, M> forAll(double (*func)(double)) {
+        Matrix<N, M> cp = *this;
+        for (std::size_t i = 0; i < N; ++i) {
+            for (std::size_t j = 0; j < M; ++j) {
+                cp[i][j] = func(cp[i][j]);
+            }
+        }
+        return cp;
+    }
 private:
     std::array<std::array<double, M>, N> data_ = std::array<std::array<double, M>, N> ();
 };
