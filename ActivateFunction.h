@@ -1,5 +1,5 @@
 class ActivateFunction {
 public:
-    double evaluate0(double value);
-    double evaluate1(double value);
+    static double evaluate0(double value);
+    static double evaluate1(double value);
 };
