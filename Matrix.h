@@ -96,3 +96,25 @@ Matrix<N, K> operator*(const Matrix<N, M> &m1, const Matrix<M, K> &m2) {
     }
     return mul;
 }
+
+template <std::size_t N, std::size_t M>
+Matrix<N, M> operator^(const Matrix<N, M> &m1, const Matrix<N, M>& m2) {
+    Matrix<N, M> mul = Matrix<N, M>();
+    for (std::size_t i = 0; i < N; ++i) {
+        for (std::size_t j = 0; j < M; ++j) {
+            mul = m1[i][j] * m2[i][j];
+        }
+    }
+    return mul;
+}
+
+template <std::size_t N, std::size_t M>
+Matrix<N, M> operator*(double c, const Matrix<N, M>& m) {
+    Matrix<N, M> mul = Matrix<N, M>();
+    for (std::size_t i = 0; i < N; ++i) {
+        for (std::size_t j = 0; j < M; ++j) {
+            mul = c * m[i][j];
+        }
+    }
+    return mul;
+}
