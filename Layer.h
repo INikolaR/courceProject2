@@ -34,6 +34,13 @@ public:
         }
         return u_sigma1 * a_;
     }
+    void updA(double step, const Matrix<M, N>& grad) {
+        a_ = a_ - (step * grad);
+    }
+
+    void updB(double step, const Matrix<M, 1>& grad) {
+        b_ = b_ - (step * grad);
+    }
 private:
     ActivateFunction f_;
     Matrix<M, N> a_;
