@@ -11,28 +11,13 @@ public:
         return (a_ * input + b_).forAll(f_.evaluate0);
     }
     Matrix<M, N> getGradA(const Matrix<1, M>& u, const Matrix<N, 1>& x) {
-        Matrix sigma1 = (a_ * x + b_).forAll(f_.evaluate1).transposed();
-        Matrix u_sigma1 = Matrix<M, 1>();
-        for (std::size_t i = 0; i < M; ++i) {
-            u_sigma1[i][0] = sigma1[0][i] * u[0][i];
-        }
-        return u_sigma1 * x.transposed();
+        return ((a_ * x + b_).forAll(f_.evaluate1) ^ u.transposed()) * x.transposed();
     }
-    Matrix<M, 1> getGradB(const Matrix<M, 1>& u, const Matrix<1, M>& x){
-        Matrix sigma1 = (a_ * x + b_).forAll(f_.evaluate1).transposed();
-        Matrix u_sigma1 = Matrix<M, 1>();
-        for (std::size_t i = 0; i < M; ++i) {
-            u_sigma1[i][0] = sigma1[0][i] * u[0][i];
-        }
-        return u_sigma1;
+    Matrix<M, 1> getGradB(const Matrix<1, M>& u, const Matrix<N, 1>& x){
+        return (a_ * x + b_).forAll(f_.evaluate1) ^ u.transposed();
     }
-    Matrix<1, N> getNextU(const Matrix<M, 1>& u, const Matrix<1, M>& x) {
-        Matrix sigma1 = (a_ * x + b_).forAll(f_.evaluate1).transposed();
-        Matrix u_sigma1 = Matrix<1, M>();
-        for (std::size_t i = 0; i < M; ++i) {
-            u_sigma1[0][i] = sigma1[0][i] * u[0][i];
-        }
-        return u_sigma1 * a_;
+    Matrix<1, N> getNextU(const Matrix<1, M>& u, const Matrix<N, 1>& x) {
+        return (u ^ (a_ * x + b_).forAll(f_.evaluate1).transposed()) * a_;
     }
     void updA(double step, const Matrix<M, N>& grad) {
         a_ = a_ - (step * grad);
