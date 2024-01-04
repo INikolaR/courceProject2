@@ -19,8 +19,9 @@ public:
             Matrix<I, 1> x = dataset[i].first;
             Matrix<M1, 1> w = l1_.evaluate(x);
             Matrix<O, 1> z = l2_.evaluate(w);
-            Matrix<1, O> u = dLdz(z, dataset[i].second);
-            // TODO rest
+            Matrix<1, O> u1 = dLdz(z, dataset[i].second);
+            Matrix<1, M1> u2 = l2_.getNextU(u1, w);
+            l2_.updA();
         }
     }
 private:
