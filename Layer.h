@@ -1,44 +1,58 @@
 #include <cstdio>
 #include <random>
 #include "ActivateFunction.h"
-#include "Matrix.h"
+#include <Eigen/Dense>
 
-template <std::size_t N, std::size_t M>
-class Layer {
-public:
-    explicit Layer<N, M>(ActivateFunction f) : f_(f), a_(generateRandomMatrix<M, N>()), b_(generateRandomMatrix<1, M>()) {}
-    Matrix<1, M> evaluate(const Matrix<1, N>& input) {
-        return (a_ * input + b_).forAll(f_.evaluate0);
-    }
-    Matrix<M, N> getGradA(const Matrix<1, M>& u, const Matrix<N, 1>& x) {
-        return ((a_ * x + b_).forAll(f_.evaluate1) ^ u.transposed()) * x.transposed();
-    }
-    Matrix<M, 1> getGradB(const Matrix<1, M>& u, const Matrix<N, 1>& x){
-        return (a_ * x + b_).forAll(f_.evaluate1) ^ u.transposed();
-    }
-    Matrix<1, N> getNextU(const Matrix<1, M>& u, const Matrix<N, 1>& x) {
-        return (u ^ (a_ * x + b_).forAll(f_.evaluate1).transposed()) * a_;
-    }
-    void updA(double step, const Matrix<M, N>& grad) {
-        a_ = a_ - (step * grad);
-    }
+using Matrix = Eigen::MatrixXd;
 
-    void updB(double step, const Matrix<M, 1>& grad) {
-        b_ = b_ - (step * grad);
-    }
-private:
-    ActivateFunction f_;
-    Matrix<M, N> a_;
-    Matrix<M, 1> b_;
-
-    template <std::size_t P, std::size_t Q>
-    Matrix<P, Q> generateRandomMatrix() {
-        std::mt19937 engine(time(0));
-        Matrix<P, Q> result = Matrix<P, Q>();
-        for (std::size_t i = 0; i < P; ++i) {
-            for (std::size_t j = 0; j < Q; ++j) {
-                result[i][j] = engine() / static_cast<double>(engine.max());
-            }
+namespace neural_network {
+    class Layer {
+    public:
+        Layer(int n, int m, ActivateFunction f) : f_(f), a_(genRandomMatrix(m, n)), b_(genRandomMatrix(m, 1)), to_upd_a_(Matrix::Zero(m, n)), to_upd_b_(Matrix::Zero(m, 1)) {}
+        Matrix evaluate(const Matrix& input) const {
+            return (a_ * input + b_).unaryExpr(&f_.evaluate0);
         }
-    }
-};
+        Matrix getGradA(const Matrix& u, const Matrix& x) {
+            return ((a_ * x + b_).unaryExpr(&f_.evaluate1).asDiagonal() * u.transpose()) * x.transpose();
+        }
+        Matrix getGradB(const Matrix& u, const Matrix& x){
+            return (a_ * x + b_).unaryExpr(&f_.evaluate1).asDiagonal() * u.transpose();
+        }
+        Matrix getNextU(const Matrix& u, const Matrix& x) {
+            return (u * (a_ * x + b_).unaryExpr(&f_.evaluate1).asDiagonal()) * a_;
+        }
+        void addToUpdA(double step, const Matrix& grad) {
+            to_upd_a_ += step * grad;
+        }
+
+        void addToUpdB(double step, const Matrix& grad) {
+            to_upd_b_ += step * grad;
+        }
+
+        void updateAB() {
+            a_ += to_upd_a_;
+            b_ += to_upd_b_;
+            to_upd_a_.setZero();
+            to_upd_b_.setZero();
+        }
+
+        void printAB() const {
+            std::cout << a_ << "\n===\n" << b_ << "\n";
+        }
+
+    private:
+        const static int SEED = 23423;
+
+        Matrix a_;
+        Matrix b_;
+        Matrix to_upd_a_;
+        Matrix to_upd_b_;
+        ActivateFunction f_;
+
+        Matrix genRandomMatrix(int n, int m) {
+            std::mt19937 engine(Layer::SEED);
+            std::uniform_real_distribution<double> dis(-1.0, 1.0);
+            return Matrix::NullaryExpr(n, m ,[&](){return dis(engine);});
+        }
+    };
+}
