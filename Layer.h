@@ -8,7 +8,7 @@ using Matrix = Eigen::MatrixXd;
 namespace neural_network {
     class Layer {
     public:
-        Layer(int n, int m, ActivateFunction f) : f_(f), a_(genRandomMatrix(m, n)), b_(genRandomMatrix(m, 1)), to_upd_a_(Matrix::Zero(m, n)), to_upd_b_(Matrix::Zero(m, 1)) {}
+        Layer(int n, int m, ActivateFunction f) : n_(n), m_(m), f_(f), a_(genRandomMatrix(m, n)), b_(genRandomMatrix(m, 1)), to_upd_a_(Matrix::Zero(m, n)), to_upd_b_(Matrix::Zero(m, 1)) {}
         Matrix evaluate(const Matrix& input) const {
             return (a_ * input + b_).unaryExpr(&f_.evaluate0);
         }
@@ -36,23 +36,29 @@ namespace neural_network {
             to_upd_b_.setZero();
         }
 
-        void printAB() const {
-            std::cout << a_ << "\n===\n" << b_ << "\n";
+        int getInputSize() const {
+            return n_;
+        }
+
+        int getOutputSize() const {
+            return m_;
         }
 
     private:
-        const static int SEED = 23423;
+        Matrix genRandomMatrix(int n, int m) {
+            std::mt19937 engine(this->SEED);
+            std::normal_distribution<double> dis(0.0, 1.0);
+            return Matrix::NullaryExpr(n, m ,[&](){return dis(engine);});
+        }
 
+        int n_;
+        int m_;
         Matrix a_;
         Matrix b_;
         Matrix to_upd_a_;
         Matrix to_upd_b_;
         ActivateFunction f_;
 
-        Matrix genRandomMatrix(int n, int m) {
-            std::mt19937 engine(Layer::SEED);
-            std::uniform_real_distribution<double> dis(-1.0, 1.0);
-            return Matrix::NullaryExpr(n, m ,[&](){return dis(engine);});
-        }
+        const int SEED = 23423;
     };
 }

@@ -4,6 +4,7 @@
 #include <array>
 #include <list>
 #include <Eigen/Dense>
+#include <cmath>
 #include "Layer.h"
 
 namespace neural_network {
@@ -12,14 +13,14 @@ namespace neural_network {
 
     class Net {
     public:
-        Net(const std::initializer_list<int>& k) : layers_(std::list<Layer>()), x_(std::list<Matrix>()) {
+        Net(const std::initializer_list<int>& k) : layers_(std::list<Layer>()), x_(std::list<std::list<Matrix>>()) {
             auto curr = k.begin();
             auto prev = curr++;
             for (;curr != k.end();++prev, ++curr) {
                 layers_.push_back(Layer(*prev, *curr, ActivateFunction()));
             }
         }
-        Matrix evaluate(const Matrix &x) {
+        Matrix predict(const Matrix &x) const {
             Matrix z = x;
             for (const auto& l : layers_) {
                 z = l.evaluate(z);
@@ -27,49 +28,65 @@ namespace neural_network {
             return z;
         }
 
-        void learn(std::vector<Batch> dataset, int times) {
-            for (int i = 0; i < times; ++i) {
-                printWeights();
-                double step = StartStep / (i + 1);
-                for (const auto &b: dataset) {
+        void fit(const std::vector<Batch>& dataset) {
+            double prev_mse = -INT_MAX;
+            double curr_mse = countMSE(dataset);
+            while (abs(prev_mse - curr_mse) > EpsilonMSE) {
+                double step = StartStep; // <- tried `step = StartStep / (i + 1)`, but that did not work.
+                for (const auto &batch: dataset) {
                     x_.clear();
-                    for (const auto &xy: b) {
+                    Matrix l = Matrix::Zero(1, layers_.back().getOutputSize());
+                    for (const auto &xy: batch) {
+                        x_.push_back(std::list<Matrix>());
                         Matrix z = xy.first;
-                        for (const auto &l: layers_) {
-                            x_.push_back(z);
-                            z = l.evaluate(z);
+                        for (const auto &layer: layers_) {
+                            x_.back().push_back(z);
+                            z = layer.evaluate(z);
                         }
-                        Matrix u = dLdz(z, xy.second);
-                        for (auto it_layers = layers_.end(); it_layers != layers_.begin();) {
-                            --it_layers;
-                            it_layers->addToUpdA(step, it_layers->getGradA(u, x_.back()));
-                            it_layers->addToUpdB(step, it_layers->getGradB(u, x_.back()));
-                            u = it_layers->getNextU(u, x_.back());
-                            x_.pop_back(); // TODO make upd after batch instd of in it.
-                        }
+                        l += dLdz(z, xy.second);
                     }
-                    for (auto &l: layers_) {
-                        l.updateAB();
+                    l = (1 / static_cast<double>(batch.size())) * l.transpose();
+                    for (const auto &xy: batch) {
+                        Matrix u = l;
+                        for (auto layer = layers_.end(); layer != layers_.begin();) {
+                            --layer;
+                            layer->addToUpdA(step, -layer->getGradA(u, x_.back().back()));
+                            layer->addToUpdB(step, -layer->getGradB(u, x_.back().back()));
+                            u = layer->getNextU(u, x_.back().back());
+                            x_.back().pop_back();
+                        }
+                        x_.pop_back();
+                    }
+                    for (auto &layer: layers_) {
+                        layer.updateAB();
                     }
                 }
+                prev_mse = curr_mse;
+                curr_mse = countMSE(dataset);
             }
         }
 
-        void printWeights() {
-            for (const auto& l : layers_) {
-                std::cout << "LAYER:\n";
-                l.printAB();
+        double countMSE(const std::vector<Batch>& dataset) const {
+            int counter = 0;
+            double mse = 0;
+            for (const auto& batch : dataset) {
+                for (const auto& xy : batch) {
+                    Matrix diff = predict(xy.first) - xy.second;
+                    mse += (diff.transpose() * diff)(0, 0);
+                    ++counter;
+                }
             }
-            std::cout << "================================\n\n\n";
+            return (counter == 0 ? 0 : mse / counter);
         }
 
     private:
-        std::list<Layer> layers_;
-        std::list<Matrix> x_;
-        constexpr static double StartStep = 0.1;
-
         Matrix dLdz(const Matrix &z, const Matrix &y) {
-            return 2 * (z.transpose() * (z - y).asDiagonal());
+            return 2 * (z - y);
         }
+
+        std::list<Layer> layers_;
+        std::list<std::list<Matrix>> x_;
+        constexpr static double StartStep = 0.0001;
+        constexpr static double EpsilonMSE = 0.001;
     };
 }
