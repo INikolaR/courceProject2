@@ -45,7 +45,7 @@ namespace neural_network {
                         }
                         l += dLdz(z, xy.second);
                     }
-                    l = (1 / static_cast<double>(batch.size())) * l.transpose();
+                    l = (1 / static_cast<double>(batch.size())) * l;
                     for (const auto &xy: batch) {
                         Matrix u = l;
                         for (auto layer = layers_.end(); layer != layers_.begin();) {
@@ -81,7 +81,7 @@ namespace neural_network {
 
     private:
         Matrix dLdz(const Matrix &z, const Matrix &y) {
-            return 2 * (z - y);
+            return 2 * (z - y).transpose();
         }
 
         std::list<Layer> layers_;

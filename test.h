@@ -5,4 +5,6 @@ namespace neural_network {
     void test_echo();
 
     void test_square();
+
+    void test_echo_vector();
 }
