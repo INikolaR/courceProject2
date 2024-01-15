@@ -1,4 +1,3 @@
-#pragma once
 namespace neural_network {
     class ActivateFunction {
     public:
