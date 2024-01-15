@@ -9,7 +9,7 @@ SET(CMAKE_PREFIX_PATH C:/eigen-3.4.0)
 FIND_PACKAGE(Eigen3 REQUIRED)
 
 SET(SOURCES ActivateFunction.cpp test.cpp)
-SET(HEADERS ActivateFunction.h Matrix.h Layer.h Net.h test.h)
+SET(HEADERS ActivateFunction.h Layer.h Net.h test.h)
 ADD_LIBRARY(lib STATIC ${SOURCES} ${HEADERS})
 TARGET_LINK_LIBRARIES(lib Eigen3::Eigen)
 ADD_LIBRARY(test_lib STATIC test.cpp test.h)
