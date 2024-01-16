@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <random>
-#include "ActivateFunction.h"
+#include "ActivationFunction.h"
 #include <Eigen/Dense>
 
 namespace neural_network {
@@ -10,7 +10,9 @@ namespace neural_network {
 
     class Layer {
     public:
-        Layer(int input_dimension, int output_dimension, ActivateFunction f);
+        static std::mt19937 engine;
+
+        Layer(int input_dimension, int output_dimension, ActivationFunction f);
         Matrix evaluate(const Matrix& input) const;
         Matrix getGradA(const Matrix& u, const Matrix& x);
         Matrix getGradB(const Matrix& u, const Matrix& x);
@@ -21,15 +23,10 @@ namespace neural_network {
         Index getInputSize() const;
         Index getOutputSize() const;
     private:
-        Matrix genRandomMatrix(int n, int m);
-        Matrix genRandomVector(int n);
-
-        constexpr static int Seed = 23423;
-
         Matrix a_;
         Vector b_;
         Matrix to_upd_a_;
         Matrix to_upd_b_;
-        ActivateFunction f_;
+        ActivationFunction f_;
     };
 }

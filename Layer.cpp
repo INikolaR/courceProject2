@@ -1,7 +1,10 @@
 #include "Layer.h"
+#include <EigenRand/EigenRand>
 
 namespace neural_network {
-    Layer::Layer(int input_dimension, int output_dimension, ActivateFunction f) : f_(f), a_(genRandomMatrix(output_dimension, input_dimension)), b_(genRandomVector(output_dimension)), to_upd_a_(Matrix::Zero(output_dimension, input_dimension)), to_upd_b_(Vector::Zero(output_dimension)) {}
+    std::mt19937 Layer::engine = std::mt19937(42345);
+
+    Layer::Layer(int input_dimension, int output_dimension, ActivationFunction f) : f_(f), a_(Eigen::Rand::normal<Matrix>(output_dimension, input_dimension, engine)), b_(Eigen::Rand::normal<Matrix>(output_dimension, 1, engine)), to_upd_a_(Matrix::Zero(output_dimension, input_dimension)), to_upd_b_(Vector::Zero(output_dimension)) {}
 
     Matrix neural_network::Layer::evaluate(const Matrix &input) const {
         return (a_ * input + b_).unaryExpr(&f_.evaluate0);
@@ -42,15 +45,15 @@ namespace neural_network {
         return a_.rows();
     }
 
-    Matrix Layer::genRandomMatrix(int n, int m) {
-        std::mt19937 engine(this->Seed);
-        std::normal_distribution<double> dis(0.0, 1.0);
-        return Matrix::NullaryExpr(n, m, [&]() { return dis(engine); });
-    }
-
-    Matrix Layer::genRandomVector(int n) {
-        std::mt19937 engine(this->Seed);
-        std::normal_distribution<double> dis(0.0, 1.0);
-        return Vector::NullaryExpr(n, [&]() { return dis(engine); });
-    }
+//    Matrix Layer::genRandomMatrix(int n, int m) {
+//        std::mt19937 engine(this->Seed);
+//        std::normal_distribution<double> dis(0.0, 1.0);
+//        return Matrix::NullaryExpr(n, m, [&]() { return dis(engine); });
+//    }
+//
+//    Matrix Layer::genRandomVector(int n) {
+//        std::mt19937 engine(this->Seed);
+//        std::normal_distribution<double> dis(0.0, 1.0);
+//        return Vector::NullaryExpr(n, [&]() { return dis(engine); });
+//    }
 }

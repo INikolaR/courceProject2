@@ -1,12 +1,13 @@
 #include "Net.h"
+#include "ActivationFunction.h"
 
 namespace neural_network {
-    Net::Net(const std::initializer_list<int> &k) : layers_(std::list<Layer>()),
+    Net::Net(std::initializer_list<int> k, ActivationFunction f) : layers_(std::list<Layer>()),
                                                                     x_(std::list<std::list<Matrix>>()) {
         auto curr = k.begin();
         auto prev = curr++;
         for (; curr != k.end(); ++prev, ++curr) {
-            layers_.push_back(Layer(*prev, *curr, ActivateFunction()));
+            layers_.push_back(Layer(*prev, *curr, f));
         }
     }
 

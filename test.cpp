@@ -9,7 +9,7 @@ void neural_network::run_all_tests() {
 
 void neural_network::test_echo() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    neural_network::Net net{1, 100, 1};
+    neural_network::Net net{{1, 100, 1}, Net::ReLU};
     std::vector<neural_network::Batch> dataset = {
             {
                     {neural_network::Matrix{{1}}, neural_network::Matrix{{1}}},
@@ -31,7 +31,7 @@ void neural_network::test_echo() {
 
 void neural_network::test_echo_vector() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    neural_network::Net net{2, 100, 2};
+    neural_network::Net net{{2, 100, 2}, Net::ReLU};
     std::vector<neural_network::Batch> dataset = {
             {
                     {neural_network::Matrix{{1}, {3}}, neural_network::Matrix{{1}, {3}}},
@@ -56,7 +56,7 @@ void neural_network::test_echo_vector() {
 
 void neural_network::test_square() {
     std::cout << "SQUARE TEST: trying to return x^2 if x is in input (x is scalar)\n";
-    neural_network::Net net{1, 100, 1};
+    neural_network::Net net{{1, 100, 1}, Net::ReLU};
     std::vector<neural_network::Batch> dataset = {
             {
                     {neural_network::Matrix{{1}}, neural_network::Matrix{{1}}},
