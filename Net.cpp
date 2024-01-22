@@ -1,13 +1,14 @@
 #include "Net.h"
 #include "ActivationFunction.h"
 
+#include <limits>
+
 namespace neural_network {
-    Net::Net(std::initializer_list<int> k, ActivationFunction f) : layers_(std::list<Layer>()),
-                                                                    x_(std::list<std::list<Matrix>>()) {
+    Net::Net(std::initializer_list<int> k, ActivationFunction f) {
         auto curr = k.begin();
         auto prev = curr++;
         for (; curr != k.end(); ++prev, ++curr) {
-            layers_.push_back(Layer(*prev, *curr, f));
+            layers_.emplace_back(Layer(*prev, *curr, f));
         }
     }
 
@@ -20,7 +21,7 @@ namespace neural_network {
     }
 
     void Net::fit(const std::vector<Batch> &dataset) {
-        double prev_mse = -INT_MAX;
+        double prev_mse = std::numeric_limits<double>::min();
         double curr_mse = countMSE(dataset);
         while (abs(prev_mse - curr_mse) > EpsilonMSE) {
             double step = StartStep; // <- tried `step = StartStep / (i + 1)`, but that did not work.
@@ -36,7 +37,7 @@ namespace neural_network {
                     }
                     l += dLdz(z, xy.second);
                 }
-                l = (1 / static_cast<double>(batch.size())) * l;
+                l = (1. / batch.size()) * l;
                 for (const auto &xy: batch) {
                     Matrix u = l;
                     for (auto layer = layers_.end(); layer != layers_.begin();) {

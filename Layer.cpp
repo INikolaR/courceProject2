@@ -44,16 +44,4 @@ namespace neural_network {
     Index Layer::getOutputSize() const {
         return a_.rows();
     }
-
-//    Matrix Layer::genRandomMatrix(int n, int m) {
-//        std::mt19937 engine(this->Seed);
-//        std::normal_distribution<double> dis(0.0, 1.0);
-//        return Matrix::NullaryExpr(n, m, [&]() { return dis(engine); });
-//    }
-//
-//    Matrix Layer::genRandomVector(int n) {
-//        std::mt19937 engine(this->Seed);
-//        std::normal_distribution<double> dis(0.0, 1.0);
-//        return Vector::NullaryExpr(n, [&]() { return dis(engine); });
-//    }
 }

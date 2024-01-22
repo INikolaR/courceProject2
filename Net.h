@@ -21,9 +21,11 @@ namespace neural_network {
         double countMSE(const std::vector<Batch>& dataset) const;
     private:
         Matrix dLdz(const Matrix &z, const Matrix &y) const;
-        std::list<Layer> layers_;
-        std::list<std::list<Matrix>> x_;
+
         constexpr static double StartStep = 0.0001;
         constexpr static double EpsilonMSE = 0.0001;
+
+        std::list<Layer> layers_;
+        std::list<std::list<Matrix>> x_;
     };
 }
