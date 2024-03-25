@@ -8,7 +8,7 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 INCLUDE_DIRECTORIES(Eigen EigenRand)
 
-SET(SOURCES ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp)
+SET(SOURCES LossFunction.cpp ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp)
 ADD_LIBRARY(lib STATIC ${SOURCES})
 ADD_LIBRARY(test_lib STATIC test.cpp)
 

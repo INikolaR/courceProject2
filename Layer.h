@@ -12,14 +12,13 @@ namespace neural_network {
     public:
         static std::mt19937 engine;
 
-        Layer(int input_dimension, int output_dimension, ActivationFunction f);
+        Layer(int input_dimension, int output_dimension, const ActivationFunction f);
         Matrix evaluate(const Matrix& input) const;
         Matrix getGradA(const Matrix& u, const Matrix& x);
         Matrix getGradB(const Matrix& u, const Matrix& x);
         Matrix getNextU(const Matrix& u, const Matrix& x);
-        void addToUpdA(double step, const Matrix& grad);
-        void addToUpdB(double step, const Matrix& grad);
-        void updateAndResetWeights();
+        void updA(double step, const Matrix& grad);
+        void updB(double step, const Vector& grad);
         Index getInputSize() const;
         Index getOutputSize() const;
     private:
@@ -27,6 +26,6 @@ namespace neural_network {
         Vector b_;
         Matrix to_upd_a_;
         Matrix to_upd_b_;
-        ActivationFunction f_;
+        const ActivationFunction f_;
     };
 }
