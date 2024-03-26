@@ -7,4 +7,8 @@ namespace neural_network {
     void test_square();
 
     void test_echo_vector();
-}
+
+    void test_mnist();
+
+    int reverse_int(int i);
+    }
