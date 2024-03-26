@@ -86,4 +86,25 @@ namespace neural_network {
         }
         return mse;
     }
+
+    double Net::accuracy(const std::vector<Element> &dataset) const {
+        double successful_guess_count = 0;
+        for (int i = 0; i < dataset.size(); ++i) {
+            Vector z = predict(dataset[i].x);
+            int ans = get_index_max(z);
+            successful_guess_count += dataset[i].y(ans);
+        }
+        return successful_guess_count / dataset.size();
+    }
+    int Net::get_index_max(Vector &v) const {
+        double max = v(0);
+        int max_index = 0;
+        for (int i = 0; i < v.rows(); ++i) {
+            if (v(i) > max) {
+                max = v(i);
+                max_index = i;
+            }
+        }
+        return max_index;
+    }
     }

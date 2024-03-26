@@ -31,11 +31,13 @@ namespace neural_network {
         Matrix predict(const Matrix &x) const;
         void fit(const std::vector<Element>& dataset, int n_of_batches, int n_of_epochs, double start_step);
         double MSE(const std::vector<Element>& dataset) const;
+        double accuracy(const std::vector<Element>& dataset) const;
         Index getInputSize() const;
         Index getOutputSize() const;
     private:
         void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, double start_step);
         void train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double start_step);
+        int get_index_max(Vector &v) const;
 
         constexpr static double StartStep = 0.001;
         constexpr static double EpsilonMSE = 0.0001;
