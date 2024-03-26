@@ -1,11 +1,13 @@
 #include "Net.h"
 #include "ActivationFunction.h"
 
-#include <limits>
+#include <cmath>
 
 namespace neural_network {
     const ActivationFunction Net::ReLU = ActivationFunction([](double x) {return (x > 0) * x;}, [](double x) {return (x > 0);});
     const ActivationFunction Net::LeakyReLU = ActivationFunction([](double x) {return (x > 0) * (1 - LeakyReluA) * x + LeakyReluA * x;}, [](double x) {return (x > 0) * (1 - LeakyReluA) + LeakyReluA;});
+    const ActivationFunction Net::Sigmoid = ActivationFunction([](double x) {return 1 / (1 + exp(-x));}, [](double x) {double s = 1 / (1 + exp(-x)); return s * (1 - s);});
+
 
     const LossFunction Net::Euclid = LossFunction(
         [](const Matrix& x, const Matrix& y) {Matrix d = x - y; return (d.transpose() * d)(0, 0);},

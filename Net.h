@@ -23,6 +23,7 @@ namespace neural_network {
     public:
         const static ActivationFunction ReLU;
         const static ActivationFunction LeakyReLU;
+        const static ActivationFunction Sigmoid;
 
         const static LossFunction Euclid;
 
