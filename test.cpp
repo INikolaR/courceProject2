@@ -2,14 +2,15 @@
 
 #include <fstream>
 #include <string>
+#include <unistd.h>
 
 #include "Net.h"
 
 namespace neural_network {
     void run_all_tests() {
-        test_echo();
+//        test_echo();
 //        test_echo_vector();
-        test_square();
+//        test_square();
         test_mnist();
     }
 
@@ -74,19 +75,21 @@ namespace neural_network {
     void test_mnist() {
         const int size_of_mnist_image = 784;
         std::cout << "MNIST TRAIN:\n";
-        Net net{{784, 256, 10}, {Net::LeakyReLU, Net::LeakyReLU}, Net::Euclid};
+        std::ifstream file_images("F:\\Kursach\\CourseProject\\train-images-idx3-ubyte\\train-images.idx3-ubyte", std::ios::binary | std::ifstream::in);
 
-        std::ifstream file_images("../train-images-idx3-ubyte/train-images.idx3-ubyte", std::ios::binary);
         if (!file_images.is_open()) {
             std::cout << "Cannot open training images\n";
+            file_images.close();
             return;
         }
+
         int images_magic_number = 0;
         const int expected_images_magic_number = 2051;
         file_images.read(reinterpret_cast<char*>(&images_magic_number), sizeof(images_magic_number));
         images_magic_number = reverse_int(images_magic_number);
         if (images_magic_number != expected_images_magic_number) {
             std::cout << "Bad MNIST image file!\n";
+            file_images.close();
             return;
         }
         int n_rows = 0;
@@ -103,6 +106,8 @@ namespace neural_network {
         std::ifstream file_labels("../train-labels-idx1-ubyte/train-labels.idx1-ubyte", std::ios::binary);
         if (!file_labels.is_open()) {
             std::cout << "Cannot open training labels\n";
+            file_images.close();
+            file_labels.close();
             return;
         }
 
@@ -112,6 +117,8 @@ namespace neural_network {
         labels_magic_number = reverse_int(labels_magic_number);
         if (labels_magic_number != expected_labels_magic_number) {
             std::cout << "Bad MNIST label file!\n";
+            file_images.close();
+            file_labels.close();
             return;
         }
 
@@ -121,16 +128,19 @@ namespace neural_network {
 
         if (number_of_labels != number_of_images) {
             std::cout << "Different number of rows in images and labels!\n";
+            file_images.close();
+            file_labels.close();
             return;
         }
+
         std::vector<Element> dataset(0);
         unsigned char image[size_of_mnist_image];
         unsigned char label = 0;
-        for (int i = 0; i < number_of_labels; i++) {
+        for (int i = 0; i < number_of_labels / 10; i++) {
             file_images.read(reinterpret_cast<char*>(image), size_of_mnist_image);
             double array_image[size_of_mnist_image];
             for (int j = 0; j < size_of_mnist_image; ++j) {
-                array_image[j] = static_cast<double>(image[j]);
+                array_image[j] = static_cast<double>(image[j]) / 255.0;
             }
             Vector x = Eigen::Map<Vector>(array_image, size_of_mnist_image);
             file_labels.read(reinterpret_cast<char*>(&label), 1);
@@ -139,7 +149,13 @@ namespace neural_network {
             Vector y = Eigen::Map<Vector>(array_label, 10);
             dataset.emplace_back(Element{x, y});
         }
-        net.fit(dataset, 1000, 1, 0.001);
+        Net net{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
+        std::cout << net.accuracy(dataset) << std::endl;
+        net.fit(dataset, 1000, 30, 0.3);
+        std::cout << "Training finish, counting accuracy..." << std::endl;
+        std::cout << net.accuracy(dataset) << std::endl;
+        file_images.close();
+        file_labels.close();
     }
 
 }

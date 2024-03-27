@@ -1,5 +1,9 @@
 #include "test.h"
 #include "exception.h"
+#include <iostream>
+#include <signal.h>
+
+#include <fstream>
 
 int main() {
     try {

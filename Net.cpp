@@ -1,6 +1,8 @@
 #include "Net.h"
 #include "ActivationFunction.h"
 
+#include <iostream>
+
 #include <cmath>
 
 namespace neural_network {
@@ -39,7 +41,9 @@ namespace neural_network {
         }
         borders.push_back(dataset.end());
         for (int epoch = 0; epoch < n_of_epochs; epoch++) {
+            std::cout << "epoch = " << epoch << std::endl;
             train_one_epoch(dataset, borders, start_step);
+            std::cout << "accuracy = " << accuracy(dataset) << std::endl;
         }
     }
 
