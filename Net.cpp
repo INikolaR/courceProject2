@@ -33,30 +33,6 @@ namespace neural_network {
         return z;
     }
 
-    void Net::train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double step) {
-        std::list<Matrix> mid_values;
-        Matrix u;
-        Matrix x(getInputSize(), end - start);
-        Matrix y(getOutputSize(), end - start);
-        for (auto i = start; i != end; ++i) {
-            x.col(i - start) = i->x;
-            y.col(i - start) = i->y;
-        }
-
-        for (const auto& layer : layers_) {
-            mid_values.emplace_back(x);
-            x = layer.evaluate(x);
-        }
-        u = l_.derivativeDist(x, y);
-        std::list<Matrix>::reverse_iterator it_x = mid_values.rbegin();
-        for (std::list<Layer>::reverse_iterator layer = layers_.rbegin(); layer != layers_.rend(); ++layer, ++it_x) {
-            Matrix grad_a = layer->getGradA(u, *it_x);
-            Vector grad_b = layer->getGradB(u, *it_x);
-            u = layer->getNextU(u, *it_x);
-            layer->updA(step, grad_a);
-            layer->updB(step, grad_b);
-        }
-    }
     Index Net::getInputSize() const {
         return layers_.front().getInputSize();
     }

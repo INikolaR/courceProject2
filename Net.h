@@ -51,10 +51,36 @@ namespace neural_network {
         template <class T>
         void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, T optimizer) {
             for (size_t i = 0; i < borders.size() - 1; ++i) {
-                train_one_batch(dataset, borders[i], borders[i + 1], optimizer.getNextStep());
+                train_one_batch(dataset, borders[i], borders[i + 1], optimizer);
+            }
+            optimizer.updateToNextIteration();
+        }
+
+        template <class T>
+        void train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, T optimizer) {
+            std::list<Matrix> mid_values;
+            Matrix u;
+            Matrix x(getInputSize(), end - start);
+            Matrix y(getOutputSize(), end - start);
+            for (auto i = start; i != end; ++i) {
+                x.col(i - start) = i->x;
+                y.col(i - start) = i->y;
+            }
+
+            for (const auto& layer : layers_) {
+                mid_values.emplace_back(x);
+                x = layer.evaluate(x);
+            }
+            u = l_.derivativeDist(x, y);
+            std::list<Matrix>::reverse_iterator it_x = mid_values.rbegin();
+            for (std::list<Layer>::reverse_iterator layer = layers_.rbegin(); layer != layers_.rend(); ++layer, ++it_x) {
+                Matrix grad_a = layer->getGradA(u, *it_x);
+                Vector grad_b = layer->getGradB(u, *it_x);
+                u = layer->getNextU(u, *it_x);
+                layer->updA(optimizer.getNextGradientCorrection(grad_a));
+                layer->updB(optimizer.getNextGradientCorrection(grad_b));
             }
         }
-        void train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double start_step);
         int get_index_max(Vector &v) const;
 
         constexpr static double StartStep = 0.001;

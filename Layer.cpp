@@ -38,12 +38,12 @@ namespace neural_network {
         return next_u;
     }
 
-    void neural_network::Layer::updA(double step, const Matrix &grad) {
-        a_ -= step * grad;
+    void neural_network::Layer::updA(const Matrix &gradient_correction) {
+        a_ -= gradient_correction;
     }
 
-    void neural_network::Layer::updB(double step, const Vector &grad) {
-        b_ -= step * grad;
+    void neural_network::Layer::updB(const Vector &gradient_correction) {
+        b_ -= gradient_correction;
     }
 
     Index Layer::getInputSize() const {

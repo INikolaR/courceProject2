@@ -17,8 +17,8 @@ namespace neural_network {
         Matrix getGradA(const Matrix& u, const Matrix& x);
         Matrix getGradB(const Matrix& u, const Matrix& x);
         Matrix getNextU(const Matrix& u, const Matrix& x);
-        void updA(double step, const Matrix& grad);
-        void updB(double step, const Vector& grad);
+        void updA(const Matrix& gradient_correction);
+        void updB(const Vector& gradient_correction);
         Index getInputSize() const;
         Index getOutputSize() const;
     private:
