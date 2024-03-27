@@ -1,8 +1,8 @@
 #include "ConstantOptimizer.h"
 
 namespace neural_network {
-    ConstantStepOptimizer::ConstantStepOptimizer(double step) : step_(step) {}
-    double ConstantStepOptimizer::getNextStep() {
+    ConstantOptimizer::ConstantOptimizer(double step) : step_(step) {}
+    double ConstantOptimizer::getNextStep() {
         return step_;
     }
 }
