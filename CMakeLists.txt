@@ -12,7 +12,7 @@ INCLUDE_DIRECTORIES(Eigen EigenRand)
 SET(SOURCES LossFunction.cpp ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp)
 ADD_LIBRARY(lib STATIC ${SOURCES})
 
-ADD_EXECUTABLE(CourseProject main.cpp ${SOURCES})
+ADD_EXECUTABLE(CourseProject main.cpp)
 SET_TARGET_PROPERTIES(CourseProject PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
 TARGET_LINK_LIBRARIES(CourseProject lib)
