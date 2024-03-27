@@ -1,9 +1,11 @@
 #include "test.h"
 
-#include <fstream>
-#include <string>
 #include <unistd.h>
 
+#include <fstream>
+#include <string>
+
+#include "ConstantOptimizer.h"
 #include "Net.h"
 
 namespace neural_network {
@@ -25,7 +27,7 @@ namespace neural_network {
                                                         {Matrix{{6}}, Matrix{{6}}},
                                                         {Matrix{{7}}, Matrix{{7}}},
                                                         {Matrix{{8}}, Matrix{{8}}}};
-        net.fit(dataset, 1, 1000, 0.01);
+        net.fit(dataset, 1, 1000, ConstantOptimizer(0.01));
         for (double i = 0; i < 12; ++i) {
             std::cout << i << " -> " << net.predict(Matrix{{i}}) << "\n";
         }
@@ -39,7 +41,7 @@ namespace neural_network {
             {neural_network::Matrix{{0}, {1}}, neural_network::Matrix{{0}, {1}}},
             {neural_network::Matrix{{1}, {1}}, neural_network::Matrix{{1}, {1}}},
             {neural_network::Matrix{{0}, {0}}, neural_network::Matrix{{0}, {0}}}};
-        net.fit(dataset, 1, 10000, 0.001);
+        net.fit(dataset, 1, 10000, ConstantOptimizer(0.001));
         std::cout << "MSE = " << net.MSE(dataset) << "\nFor example:\n";
         for (size_t i = 0; i < dataset.size(); ++i) {
             std::cout << dataset[i].x << "\n->\n" << net.predict(dataset[i].x) << "\n";
@@ -57,7 +59,7 @@ namespace neural_network {
                                                         {neural_network::Matrix{{6}}, neural_network::Matrix{{36}}},
                                                         {neural_network::Matrix{{7}}, neural_network::Matrix{{49}}},
                                                         {neural_network::Matrix{{8}}, neural_network::Matrix{{64}}}};
-        net.fit(dataset, 1, 1000, 0.00002);
+        net.fit(dataset, 1, 1000, ConstantOptimizer(0.00002));
         std::cout << net.MSE(dataset) << "\n";
         for (double i = 0; i < 12; ++i) {
             std::cout << i << " -> " << net.predict(neural_network::Matrix{{i}}) << "\n";
@@ -136,7 +138,7 @@ namespace neural_network {
         std::vector<Element> dataset(0);
         unsigned char image[size_of_mnist_image];
         unsigned char label = 0;
-        for (int i = 0; i < number_of_labels / 10; i++) {
+        for (int i = 0; i < number_of_labels; i++) {
             file_images.read(reinterpret_cast<char*>(image), size_of_mnist_image);
             double array_image[size_of_mnist_image];
             for (int j = 0; j < size_of_mnist_image; ++j) {
@@ -151,7 +153,7 @@ namespace neural_network {
         }
         Net net{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
         std::cout << net.accuracy(dataset) << std::endl;
-        net.fit(dataset, 1000, 30, 0.3);
+        net.fit(dataset, 10000, 30, ConstantOptimizer(0.3));
         std::cout << "Training finish, counting accuracy..." << std::endl;
         std::cout << net.accuracy(dataset) << std::endl;
         file_images.close();

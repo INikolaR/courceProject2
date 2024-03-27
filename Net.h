@@ -26,16 +26,34 @@ namespace neural_network {
         const static ActivationFunction Sigmoid;
 
         const static LossFunction Euclid;
-
         Net(std::initializer_list<int> k, std::initializer_list<ActivationFunction> f, LossFunction l);
         Matrix predict(const Matrix &x) const;
-        void fit(const std::vector<Element>& dataset, int n_of_batches, int n_of_epochs, double start_step);
         double MSE(const std::vector<Element>& dataset) const;
         double accuracy(const std::vector<Element>& dataset) const;
         Index getInputSize() const;
         Index getOutputSize() const;
+
+        template<class T>
+        void fit(const std::vector<Element>& dataset, int n_of_batches, int n_of_epochs, T optimizer) {
+            int64_t size_of_batch = dataset.size() / n_of_batches;
+            std::vector<ConstElemIterator> borders(0);
+            for (int64_t i = 0; i < n_of_batches; ++i) {
+                borders.emplace_back(dataset.begin() + i * size_of_batch);
+            }
+            borders.push_back(dataset.end());
+            for (int epoch = 0; epoch < n_of_epochs; epoch++) {
+                std::cout << "epoch = " << epoch << std::endl;
+                train_one_epoch(dataset, borders, optimizer);
+                std::cout << "accuracy = " << accuracy(dataset) << std::endl;
+            }
+        }
     private:
-        void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, double start_step);
+        template <class T>
+        void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, T optimizer) {
+            for (size_t i = 0; i < borders.size() - 1; ++i) {
+                train_one_batch(dataset, borders[i], borders[i + 1], optimizer.getNextStep());
+            }
+        }
         void train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double start_step);
         int get_index_max(Vector &v) const;
 

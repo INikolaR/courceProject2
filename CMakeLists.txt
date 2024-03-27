@@ -1,5 +1,4 @@
 PROJECT(CourseProject)
-SET(CMAKE_DEBUG_POSTFIX d)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
 
@@ -9,10 +8,9 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 INCLUDE_DIRECTORIES(Eigen EigenRand)
 
-SET(SOURCES LossFunction.cpp ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp)
+SET(SOURCES LossFunction.cpp ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp ConstantOptimizer.cpp)
 ADD_LIBRARY(lib STATIC ${SOURCES})
 
 ADD_EXECUTABLE(CourseProject main.cpp)
-SET_TARGET_PROPERTIES(CourseProject PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
 TARGET_LINK_LIBRARIES(CourseProject lib)

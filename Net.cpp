@@ -33,27 +33,7 @@ namespace neural_network {
         return z;
     }
 
-    void Net::fit(const std::vector<Element> &dataset, int n_of_batches, int n_of_epochs, double start_step) {
-        int64_t size_of_batch = dataset.size() / n_of_batches;
-        std::vector<ConstElemIterator> borders(0);
-        for (int64_t i = 0; i < n_of_batches; ++i) {
-            borders.emplace_back(dataset.begin() + i * size_of_batch);
-        }
-        borders.push_back(dataset.end());
-        for (int epoch = 0; epoch < n_of_epochs; epoch++) {
-            std::cout << "epoch = " << epoch << std::endl;
-            train_one_epoch(dataset, borders, start_step);
-            std::cout << "accuracy = " << accuracy(dataset) << std::endl;
-        }
-    }
-
-    void Net::train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator> &borders, double start_step) {
-        for (size_t i = 0; i < borders.size() - 1; ++i) {
-            train_one_batch(dataset, borders[i], borders[i + 1], start_step);
-        }
-    }
-    void Net::train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double start_step) {
-        double step = start_step;
+    void Net::train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, double step) {
         std::list<Matrix> mid_values;
         Matrix u;
         Matrix x(getInputSize(), end - start);
