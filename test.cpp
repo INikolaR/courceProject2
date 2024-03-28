@@ -1,8 +1,8 @@
 #include "test.h"
 
+#include <chrono>
 #include <fstream>
 #include <string>
-#include <chrono>
 
 #include "AdamOptimizer.h"
 #include "ConstantOptimizer.h"
@@ -148,7 +148,8 @@ void test_mnist() {
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
 
-    std::cout << "TEST 1 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 1000 batches during 10 epochs\n";
+    std::cout
+        << "TEST 1 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 1000 batches during 10 epochs\n";
     std::cout << "Using constant step length = 0.3\n";
     Net net1{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
 
@@ -159,8 +160,6 @@ void test_mnist() {
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s\n";
     std::cout << "MSE: " << net1.MSE(dataset) << "\n";
     std::cout << "Accuracy: " << net1.accuracy(dataset) * 100 << "%\n";
-
-
 
     std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 10k batches during 10 epochs\n";
     std::cout << "Using constant step length = 0.3\n";
@@ -173,8 +172,6 @@ void test_mnist() {
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s\n";
     std::cout << "MSE: " << net2.MSE(dataset) << "\n";
     std::cout << "Accuracy: " << net2.accuracy(dataset) * 100 << "%\n";
-
-
 
     std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 10k batches during 8 epochs\n";
     std::cout << "Using Adam optimizer with params: start_step = 0.003, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8\n";

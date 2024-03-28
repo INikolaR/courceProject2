@@ -1,12 +1,13 @@
-#include <iostream>
 #include "exception.h"
+
+#include <iostream>
 
 void neural_network::react() {
     try {
         throw;
-    } catch(std::exception& e) {
+    } catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << "\n";
-    } catch(...) {
+    } catch (...) {
         std::cout << "Unknown exception\n";
     }
 }

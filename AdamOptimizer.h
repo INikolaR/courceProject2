@@ -14,9 +14,10 @@ struct Momentum {
 class AdamOptimizer {
 public:
     AdamOptimizer(double start_step, double beta1, double beta2, double epsilon);
-    void reset(std::list<Layer> &layers);
-    void trainOneBatch(std::list<Layer>& layers, const LossFunction& l, const std::vector<Element> &dataset, ConstElemIterator start,
-                       ConstElemIterator end);
+    void reset(std::list<Layer>& layers);
+    void trainOneBatch(std::list<Layer>& layers, const LossFunction& l, const std::vector<Element>& dataset,
+                       ConstElemIterator start, ConstElemIterator end);
+
 private:
     double start_step_;
 
@@ -31,4 +32,4 @@ private:
     std::list<Momentum> m_;
     std::list<Momentum> v_;
 };
-}
+}  // namespace neural_network

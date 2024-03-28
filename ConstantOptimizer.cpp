@@ -1,13 +1,14 @@
 #include "ConstantOptimizer.h"
 
 namespace neural_network {
-ConstantOptimizer::ConstantOptimizer(double step) : step_(step) {}
-
-void ConstantOptimizer::reset(std::list<Layer> &layers) {
-
+ConstantOptimizer::ConstantOptimizer(double step) : step_(step) {
 }
 
-void ConstantOptimizer::trainOneBatch(std::list<Layer>& layers, const LossFunction& l, const std::vector<Element> &dataset, ConstElemIterator start,
+void ConstantOptimizer::reset(std::list<Layer>& layers) {
+}
+
+void ConstantOptimizer::trainOneBatch(std::list<Layer>& layers, const LossFunction& l,
+                                      const std::vector<Element>& dataset, ConstElemIterator start,
                                       ConstElemIterator end) {
     std::list<Matrix> mid_values;
     Matrix u;
@@ -32,4 +33,4 @@ void ConstantOptimizer::trainOneBatch(std::list<Layer>& layers, const LossFuncti
         layer->updB(step_ * grad_b);
     }
 }
-}
+}  // namespace neural_network
