@@ -69,7 +69,7 @@ int reverse_int(int i) {
 void test_mnist() {
     const int size_of_mnist_image = 784;
     std::cout << "MNIST TRAIN:\n";
-    std::ifstream file_images("F:\\Kursach\\CourseProject\\train-images-idx3-ubyte\\train-images.idx3-ubyte",
+    std::ifstream file_images("../train-images-idx3-ubyte/train-images.idx3-ubyte",
                               std::ios::binary | std::ifstream::in);
 
     if (!file_images.is_open()) {
