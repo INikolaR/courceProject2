@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdio>
 #include <iostream>
 #include <vector>
@@ -34,7 +36,8 @@ namespace neural_network {
         Index getOutputSize() const;
 
         template<class T>
-        void fit(const std::vector<Element>& dataset, int n_of_batches, int n_of_epochs, T optimizer) {
+        void fit(const std::vector<Element> &dataset, int n_of_batches, int n_of_epochs, T optimizer) {
+            optimizer.reset(layers_);
             int64_t size_of_batch = dataset.size() / n_of_batches;
             std::vector<ConstElemIterator> borders(0);
             for (int64_t i = 0; i < n_of_batches; ++i) {
@@ -42,43 +45,14 @@ namespace neural_network {
             }
             borders.push_back(dataset.end());
             for (int epoch = 0; epoch < n_of_epochs; epoch++) {
-                std::cout << "epoch = " << epoch << std::endl;
                 train_one_epoch(dataset, borders, optimizer);
-                std::cout << "accuracy = " << accuracy(dataset) << std::endl;
             }
         }
     private:
         template <class T>
-        void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, T optimizer) {
+        void train_one_epoch(const std::vector<Element> &dataset, const std::vector<ConstElemIterator>& borders, T &optimizer) {
             for (size_t i = 0; i < borders.size() - 1; ++i) {
-                train_one_batch(dataset, borders[i], borders[i + 1], optimizer);
-            }
-            optimizer.updateToNextIteration();
-        }
-
-        template <class T>
-        void train_one_batch(const std::vector<Element> &dataset, ConstElemIterator start, ConstElemIterator end, T optimizer) {
-            std::list<Matrix> mid_values;
-            Matrix u;
-            Matrix x(getInputSize(), end - start);
-            Matrix y(getOutputSize(), end - start);
-            for (auto i = start; i != end; ++i) {
-                x.col(i - start) = i->x;
-                y.col(i - start) = i->y;
-            }
-
-            for (const auto& layer : layers_) {
-                mid_values.emplace_back(x);
-                x = layer.evaluate(x);
-            }
-            u = l_.derivativeDist(x, y);
-            std::list<Matrix>::reverse_iterator it_x = mid_values.rbegin();
-            for (std::list<Layer>::reverse_iterator layer = layers_.rbegin(); layer != layers_.rend(); ++layer, ++it_x) {
-                Matrix grad_a = layer->getGradA(u, *it_x);
-                Vector grad_b = layer->getGradB(u, *it_x);
-                u = layer->getNextU(u, *it_x);
-                layer->updA(optimizer.getNextGradientCorrection(grad_a));
-                layer->updB(optimizer.getNextGradientCorrection(grad_b));
+                optimizer.trainOneBatch(layers_, l_, dataset, borders[i], borders[i + 1]);
             }
         }
         int get_index_max(Vector &v) const;
