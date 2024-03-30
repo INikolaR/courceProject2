@@ -27,12 +27,11 @@ void test_echo() {
 
 void test_echo_vector() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    neural_network::Net net{{2, 100, 100, 2}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}, Net::Euclid};
-    std::vector<neural_network::Element> dataset = {
-        {neural_network::Matrix{{1}, {0}}, neural_network::Matrix{{1}, {0}}},
-        {neural_network::Matrix{{0}, {1}}, neural_network::Matrix{{0}, {1}}},
-        {neural_network::Matrix{{1}, {1}}, neural_network::Matrix{{1}, {1}}},
-        {neural_network::Matrix{{0}, {0}}, neural_network::Matrix{{0}, {0}}}};
+    Net net{{2, 100, 100, 2}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}, Net::Euclid};
+    std::vector<Element> dataset = {{Matrix{{1}, {0}}, Matrix{{1}, {0}}},
+                                    {Matrix{{0}, {1}}, Matrix{{0}, {1}}},
+                                    {Matrix{{1}, {1}}, Matrix{{1}, {1}}},
+                                    {Matrix{{0}, {0}}, Matrix{{0}, {0}}}};
     net.fit(dataset, 1, 10000, ConstantOptimizer(0.001));
     std::cout << "MSE = " << net.MSE(dataset) << "\nFor example:\n";
     for (size_t i = 0; i < dataset.size(); ++i) {
@@ -42,19 +41,15 @@ void test_echo_vector() {
 
 void test_square() {
     std::cout << "SQUARE TEST: trying to return x^2 if x is in input (x is scalar)\n";
-    neural_network::Net net{{1, 20, 20, 1}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}, Net::Euclid};
-    std::vector<neural_network::Element> dataset = {{neural_network::Matrix{{1}}, neural_network::Matrix{{1}}},
-                                                    {neural_network::Matrix{{2}}, neural_network::Matrix{{4}}},
-                                                    {neural_network::Matrix{{3}}, neural_network::Matrix{{9}}},
-                                                    {neural_network::Matrix{{4}}, neural_network::Matrix{{16}}},
-                                                    {neural_network::Matrix{{5}}, neural_network::Matrix{{25}}},
-                                                    {neural_network::Matrix{{6}}, neural_network::Matrix{{36}}},
-                                                    {neural_network::Matrix{{7}}, neural_network::Matrix{{49}}},
-                                                    {neural_network::Matrix{{8}}, neural_network::Matrix{{64}}}};
+    Net net{{1, 20, 20, 1}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}, Net::Euclid};
+    std::vector<Element> dataset = {{Matrix{{1}}, Matrix{{1}}},  {Matrix{{2}}, Matrix{{4}}},
+                                    {Matrix{{3}}, Matrix{{9}}},  {Matrix{{4}}, Matrix{{16}}},
+                                    {Matrix{{5}}, Matrix{{25}}}, {Matrix{{6}}, Matrix{{36}}},
+                                    {Matrix{{7}}, Matrix{{49}}}, {Matrix{{8}}, Matrix{{64}}}};
     net.fit(dataset, 1, 1000, ConstantOptimizer(0.00002));
     std::cout << net.MSE(dataset) << "\n";
     for (double i = 0; i < 12; ++i) {
-        std::cout << i << " -> " << net.predict(neural_network::Matrix{{i}}) << "\n";
+        std::cout << i << " -> " << net.predict(Matrix{{i}}) << "\n";
     }
 }
 

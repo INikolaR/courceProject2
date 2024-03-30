@@ -8,7 +8,7 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 INCLUDE_DIRECTORIES(Eigen EigenRand)
 
-SET(SOURCES LossFunction.cpp ActivationFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp ConstantOptimizer.cpp AdamOptimizer.cpp)
+SET(SOURCES LossFunction.cpp SmoothFunction.cpp Layer.cpp Net.cpp test.cpp exception.cpp ConstantOptimizer.cpp AdamOptimizer.cpp)
 ADD_LIBRARY(lib STATIC ${SOURCES})
 
 ADD_EXECUTABLE(CourseProject main.cpp)

@@ -8,9 +8,9 @@
 #include <list>
 #include <vector>
 
-#include "ActivationFunction.h"
 #include "Layer.h"
 #include "LossFunction.h"
+#include "SmoothFunction.h"
 
 namespace neural_network {
 using Index = Eigen::Index;
@@ -24,12 +24,12 @@ using ConstElemIterator = std::vector<Element>::const_iterator;
 
 class Net {
 public:
-    const static ActivationFunction ReLU;
-    const static ActivationFunction LeakyReLU;
-    const static ActivationFunction Sigmoid;
+    const static SmoothFunction ReLU;
+    const static SmoothFunction LeakyReLU;
+    const static SmoothFunction Sigmoid;
 
     const static LossFunction Euclid;
-    Net(std::initializer_list<int> k, std::initializer_list<ActivationFunction> f, LossFunction l);
+    Net(std::initializer_list<int> k, std::initializer_list<SmoothFunction> f, LossFunction l);
     Matrix predict(const Matrix &x) const;
     double MSE(const std::vector<Element> &dataset) const;
     double accuracy(const std::vector<Element> &dataset) const;

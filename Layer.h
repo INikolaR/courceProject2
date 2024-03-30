@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include <random>
 
-#include "ActivationFunction.h"
+#include "SmoothFunction.h"
 
 namespace neural_network {
 using Matrix = Eigen::MatrixXd;
@@ -15,7 +15,7 @@ class Layer {
 public:
     static std::mt19937 engine;
 
-    Layer(int input_dimension, int output_dimension, const ActivationFunction f);
+    Layer(int input_dimension, int output_dimension, const SmoothFunction f);
     Matrix evaluate(const Matrix& input) const;
     Matrix getGradA(const Matrix& u, const Matrix& x);
     Matrix getGradB(const Matrix& u, const Matrix& x);
@@ -30,6 +30,6 @@ private:
     Vector b_;
     Matrix to_upd_a_;
     Matrix to_upd_b_;
-    const ActivationFunction f_;
+    const SmoothFunction f_;
 };
 }  // namespace neural_network

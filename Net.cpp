@@ -3,15 +3,14 @@
 #include <cmath>
 #include <iostream>
 
-#include "ActivationFunction.h"
+#include "SmoothFunction.h"
 
 namespace neural_network {
-const ActivationFunction Net::ReLU =
-    ActivationFunction([](double x) { return (x > 0) * x; }, [](double x) { return (x > 0); });
-const ActivationFunction Net::LeakyReLU =
-    ActivationFunction([](double x) { return (x > 0) * (1 - LeakyReluA) * x + LeakyReluA * x; },
+const SmoothFunction Net::ReLU = SmoothFunction([](double x) { return (x > 0) * x; }, [](double x) { return (x > 0); });
+const SmoothFunction Net::LeakyReLU =
+    SmoothFunction([](double x) { return (x > 0) * (1 - LeakyReluA) * x + LeakyReluA * x; },
                        [](double x) { return (x > 0) * (1 - LeakyReluA) + LeakyReluA; });
-const ActivationFunction Net::Sigmoid = ActivationFunction([](double x) { return 1 / (1 + exp(-x)); },
+const SmoothFunction Net::Sigmoid = SmoothFunction([](double x) { return 1 / (1 + exp(-x)); },
                                                            [](double x) {
                                                                double s = 1 / (1 + exp(-x));
                                                                return s * (1 - s);
@@ -24,7 +23,7 @@ const LossFunction Net::Euclid = LossFunction(
     },
     [](const Matrix &x, const Matrix &y) { return 2 * (x - y).transpose(); });
 
-Net::Net(std::initializer_list<int> k, std::initializer_list<ActivationFunction> f, LossFunction l) : l_(l) {
+Net::Net(std::initializer_list<int> k, std::initializer_list<SmoothFunction> f, LossFunction l) : l_(l) {
     auto curr_size = k.begin();
     auto prev_size = curr_size++;
     auto activation_function = f.begin();
