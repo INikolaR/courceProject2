@@ -66,16 +66,13 @@ int reverse_int(int i) {
     return (static_cast<int>(c1) << 24) + (static_cast<int>(c2) << 16) + (static_cast<int>(c3) << 8) + c4;
 }
 
-void test_mnist() {
+std::vector<Element> parseMNISTDataset(const std::string& path_to_images_file, const std::string& path_to_labels_file) {
     const int size_of_mnist_image = 784;
-    std::cout << "MNIST TRAIN:\n";
-    std::ifstream file_images("../train-images-idx3-ubyte/train-images.idx3-ubyte",
-                              std::ios::binary | std::ifstream::in);
+    std::ifstream file_images(path_to_images_file, std::ios::binary | std::ifstream::in);
 
     if (!file_images.is_open()) {
-        std::cout << "Cannot open training images\n";
         file_images.close();
-        return;
+        throw std::runtime_error("Cannot open training images");
     }
 
     int images_magic_number = 0;
@@ -83,9 +80,8 @@ void test_mnist() {
     file_images.read(reinterpret_cast<char*>(&images_magic_number), sizeof(images_magic_number));
     images_magic_number = reverse_int(images_magic_number);
     if (images_magic_number != expected_images_magic_number) {
-        std::cout << "Bad MNIST image file!\n";
+        throw std::runtime_error("Bad MNIST image file!");
         file_images.close();
-        return;
     }
     int n_rows = 0;
     int n_cols = 0;
@@ -98,12 +94,11 @@ void test_mnist() {
     file_images.read(reinterpret_cast<char*>(&n_cols), sizeof(n_cols));
     n_cols = reverse_int(n_cols);
 
-    std::ifstream file_labels("../train-labels-idx1-ubyte/train-labels.idx1-ubyte", std::ios::binary);
+    std::ifstream file_labels(path_to_labels_file, std::ios::binary);
     if (!file_labels.is_open()) {
-        std::cout << "Cannot open training labels\n";
         file_images.close();
         file_labels.close();
-        return;
+        throw std::runtime_error("Cannot open training labels");
     }
 
     int labels_magic_number = 0;
@@ -111,10 +106,9 @@ void test_mnist() {
     file_labels.read(reinterpret_cast<char*>(&labels_magic_number), sizeof(labels_magic_number));
     labels_magic_number = reverse_int(labels_magic_number);
     if (labels_magic_number != expected_labels_magic_number) {
-        std::cout << "Bad MNIST label file!\n";
         file_images.close();
         file_labels.close();
-        return;
+        throw std::runtime_error("Bad MNIST label file!");
     }
 
     int number_of_labels = 0;
@@ -122,10 +116,9 @@ void test_mnist() {
     number_of_labels = reverse_int(number_of_labels);
 
     if (number_of_labels != number_of_images) {
-        std::cout << "Different number of rows in images and labels!\n";
         file_images.close();
         file_labels.close();
-        return;
+        throw std::runtime_error("Different number of rows in images and labels!");
     }
 
     std::vector<Element> dataset(0);
@@ -144,6 +137,18 @@ void test_mnist() {
         Vector y = Eigen::Map<Vector>(array_label, 10);
         dataset.emplace_back(Element{x, y});
     }
+    file_images.close();
+    file_labels.close();
+    return dataset;
+}
+
+void test_mnist() {
+    std::cout << "MNIST TRAIN:\n";
+
+    std::vector<Element> train = parseMNISTDataset("../train-images-idx3-ubyte/train-images.idx3-ubyte",
+                                                   "../train-labels-idx1-ubyte/train-labels.idx1-ubyte");
+    std::vector<Element> test = parseMNISTDataset("../t10k-images-idx3-ubyte/t10k-images.idx3-ubyte",
+                                                  "../t10k-labels-idx1-ubyte/t10k-labels.idx1-ubyte");
 
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
@@ -154,39 +159,35 @@ void test_mnist() {
     Net net1{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
 
     begin = std::chrono::steady_clock::now();
-    net1.fit(dataset, 1000, 10, ConstantOptimizer(0.3));
+    net1.fit(train, 1000, 10, ConstantOptimizer(0.3));
     end = std::chrono::steady_clock::now();
 
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s\n";
-    std::cout << "MSE: " << net1.MSE(dataset) << "\n";
-    std::cout << "Accuracy: " << net1.accuracy(dataset) * 100 << "%\n";
+    std::cout << "MSE: " << net1.MSE(test) << "\n";
+    std::cout << "Accuracy: " << net1.accuracy(test) * 100 << "%\n";
 
     std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 10k batches during 10 epochs\n";
     std::cout << "Using constant step length = 0.3\n";
     Net net2{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
 
     begin = std::chrono::steady_clock::now();
-    net2.fit(dataset, 10000, 10, ConstantOptimizer(0.3));
+    net2.fit(train, 10000, 10, ConstantOptimizer(0.3));
     end = std::chrono::steady_clock::now();
 
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s\n";
-    std::cout << "MSE: " << net2.MSE(dataset) << "\n";
-    std::cout << "Accuracy: " << net2.accuracy(dataset) * 100 << "%\n";
+    std::cout << "MSE: " << net2.MSE(test) << "\n";
+    std::cout << "Accuracy: " << net2.accuracy(test) * 100 << "%\n";
 
-    std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 10k batches during 8 epochs\n";
+    std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10 | Using 10k batches during 10 epochs\n";
     std::cout << "Using Adam optimizer with params: start_step = 0.003, beta1 = 0.9, beta2 = 0.999, epsilon = 1e-8\n";
     Net net3{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
 
     begin = std::chrono::steady_clock::now();
-    net3.fit(dataset, 10000, 8, AdamOptimizer(0.003, 0.9, 0.999, 1e-8));
+    net3.fit(train, 10000, 20, AdamOptimizer(0.005, 0.9, 0.999, 1e-8));
     end = std::chrono::steady_clock::now();
 
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count() << "s\n";
-    std::cout << "MSE: " << net3.MSE(dataset) << "\n";
-    std::cout << "Accuracy: " << net3.accuracy(dataset) * 100 << "%\n";
-
-    file_images.close();
-    file_labels.close();
+    std::cout << "MSE: " << net3.MSE(test) << "\n";
+    std::cout << "Accuracy: " << net3.accuracy(test) * 100 << "%\n";
 }
-
 }  // namespace neural_network
