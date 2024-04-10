@@ -3,9 +3,9 @@
 #include <Eigen/Dense>
 #include <functional>
 
-namespace neural_network {
-using Matrix = Eigen::MatrixXd;
+#include "CustomTypes.h"
 
+namespace neural_network {
 class LossFunction {
 public:
     LossFunction(std::function<double(const Matrix&, const Matrix&)>&& f0,

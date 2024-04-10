@@ -2,9 +2,9 @@
 #include <functional>
 
 namespace neural_network {
-class SmoothFunction {
+class ActivationFunction {
 public:
-    SmoothFunction(std::function<double(double)>&& f0, std::function<double(double)>&& f1);
+    ActivationFunction(std::function<double(double)>&& f0, std::function<double(double)>&& f1);
     double evaluate0(double x) const;
     double evaluate1(double x) const;
 
