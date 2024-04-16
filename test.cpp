@@ -19,10 +19,10 @@ int reverse_int(int i) {
 }
 
 void run_all_tests() {
-    test_echo();
-    test_echo_vector();
-    test_square();
-    //    test_mnist();
+    //    test_echo();
+    //    test_echo_vector();
+    //    test_square();
+    test_mnist();
 }
 
 void test_echo() {
@@ -66,7 +66,7 @@ void test_square() {
         {Matrix{{5}}, Matrix{{25}}}, {Matrix{{6}}, Matrix{{36}}},
         {Matrix{{7}}, Matrix{{49}}}, {Matrix{{8}}, Matrix{{64}}}};
     net.fit(dataset, Net::Euclid, 10, 1000,
-            Optimizer(AdamOptimizer(0.05, 0.9, 0.999, 1e-8)));
+            Optimizer::Adam(0.05, 0.9, 0.999, 1e-8));
     std::cout << net.getLoss(dataset, Net::Euclid) << "\n";
     for (double i = 0; i < 12; ++i) {
         std::cout << i << " -> " << net.predict(Matrix{{i}}) << "\n";
@@ -167,52 +167,61 @@ void test_mnist() {
     std::chrono::steady_clock::time_point begin;
     std::chrono::steady_clock::time_point end;
 
-    //    std::cout
-    //        << "TEST 1 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> 10
-    //        | Using 1000 batches during 10 epochs\n";
-    //    std::cout << "Using constant step length = 0.3\n";
-    //    Net net1{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}, Net::Euclid};
-    //
-    //    begin = std::chrono::steady_clock::now();
-    //    net1.fit(train, 1000, 10, ConstantOptimizer(0.3));
-    //    end = std::chrono::steady_clock::now();
-    //
-    //    std::cout << "Time: " <<
-    //    std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-    //    << "s\n"; std::cout << "MSE: " << net1.MSE(test) << "\n"; std::cout <<
-    //    "Accuracy: " << net1.accuracy(test) * 100 << "%\n";
-    //
-    //    std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid
-    //    -> 10 | Using 10k batches during 10 epochs\n"; std::cout << "Using
-    //    constant step length = 0.3\n"; Net net2{{784, 256, 10}, {Net::Sigmoid,
-    //    Net::Sigmoid}, Net::Euclid};
-    //
-    //    begin = std::chrono::steady_clock::now();
-    //    net2.fit(train, 10000, 10, ConstantOptimizer(0.3));
-    //    end = std::chrono::steady_clock::now();
-    //
-    //    std::cout << "Time: " <<
-    //    std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
-    //    << "s\n"; std::cout << "MSE: " << net2.MSE(test) << "\n"; std::cout <<
-    //    "Accuracy: " << net2.accuracy(test) * 100 << "%\n";
-
-    std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> "
-                 "10 | Using 10k batches during 10 epochs\n";
-    std::cout << "Using Adam optimizer with params: start_step = 0.003, beta1 "
-                 "= 0.9, beta2 = 0.999, epsilon = 1e-8\n";
-    Net net3{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+    std::cout << "TEST 1 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> "
+                 "10 | Using batches of 60 elements during 10 epochs\n ";
+    std::cout << "Using constant step length = 0.3\n";
+    Net net1{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
 
     begin = std::chrono::steady_clock::now();
-    //    net3.fit(train, 10000, 20, AdamOptimizer(0.005, 0.9, 0.999, 1e-8));
-    net3.fit(train, Net::Euclid, 6, 20,
-             Optimizer(AdamOptimizer(0.005, 0.9, 0.999, 1e-8)));
+    net1.fit(train, Net::Euclid, 60, 10, Optimizer::Constant(0.3));
     end = std::chrono::steady_clock::now();
 
     std::cout
         << "Time: "
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
         << "s\n";
-    std::cout << "MSE: " << net3.getLoss(test, Net::Euclid) << "\n";
-    std::cout << "Accuracy: " << net3.accuracy(test) * 100 << "%\n";
+    std::cout << "MSE on train: " << net1.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "Accuracy on train: " << net1.accuracy(train) * 100 << "%\n";
+    std::cout << "MSE on test: " << net1.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "Accuracy on test: " << net1.accuracy(test) * 100 << "%\n";
+
+    std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid ->10 "
+                 "| Using batches of 6 elements during 10 epochs\n";
+    std::cout << " Using momentum with params: step_length = 0.3, momentum = 0.9\n ";
+    Net net2{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+
+    begin = std::chrono::steady_clock::now();
+    net2.fit(train, Net::Euclid, 6, 10, Optimizer::Momentum(0.3, 0.9));
+    end = std::chrono::steady_clock::now();
+
+    std::cout
+        << "Time: "
+        << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
+        << "s\n";
+
+    std::cout << "MSE on train: " << net2.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "Accuracy on train: " << net2.accuracy(train) * 100 << "%\n";
+    std::cout << "MSE on test: " << net2.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "Accuracy on test: " << net2.accuracy(test) * 100 << "%\n";
+
+    std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> "
+                 "10 | Using batches of 6 elements during 10 epochs\n";
+    std::cout << "Using Adam optimizer with params: start_step = 0.003, beta1 "
+                 "= 0.9, beta2 = 0.999, epsilon = 1e-8\n";
+    Net net3{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+
+    begin = std::chrono::steady_clock::now();
+    net3.fit(train, Net::Euclid, 6, 20,
+             Optimizer::Adam(0.005, 0.9, 0.999, 1e-8));
+    end = std::chrono::steady_clock::now();
+
+    std::cout
+        << "Time: "
+        << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
+        << "s\n";
+    std::cout << "MSE on train: " << net3.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "Accuracy on train: " << net3.accuracy(train) * 100 << "%\n";
+    std::cout << "MSE on test: " << net3.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "Accuracy on test: " << net3.accuracy(test) * 100 << "%\n";
 }
 }  // namespace neural_network

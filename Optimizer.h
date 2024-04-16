@@ -9,7 +9,11 @@
 namespace neural_network {
 class Optimizer {
 public:
-    Optimizer(
+    static Optimizer Constant(double alpha);
+    static Optimizer Momentum(double alpha, double beta);
+    static Optimizer Adam(double start_alpha, double beta1, double beta2,
+                          double epsilon);
+    explicit Optimizer(
         std::function<void(std::list<Layer> *, const LossFunction &,
                            const std::vector<TrainUnit> &, int, int)> &&f);
     void fit(std::list<Layer> *layers, const LossFunction &l,
@@ -20,6 +24,5 @@ private:
     std::function<void(std::list<Layer> *, const LossFunction &,
                        const std::vector<TrainUnit> &, Index, Index)>
         f_;
-
 };
 }  // namespace neural_network

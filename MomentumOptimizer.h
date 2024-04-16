@@ -7,7 +7,7 @@
 #include "LossFunction.h"
 
 namespace neural_network {
-class AdamOptimizer {
+class MomentumOptimizer {
     using ConstTrainUnitIterator = std::vector<TrainUnit>::const_iterator;
     struct Momentum {
         Matrix a;
@@ -15,8 +15,7 @@ class AdamOptimizer {
     };
 
 public:
-    AdamOptimizer(double start_alpha, double beta1, double beta2,
-                  double epsilon);
+    MomentumOptimizer(double alpha, double beta);
     void operator()(std::list<Layer> *layers, const LossFunction &l,
                     const std::vector<TrainUnit> &dataset, int size_of_batch,
                     int n_of_epochs);
@@ -30,13 +29,8 @@ private:
                          ConstTrainUnitIterator end);
 
 private:
-    double start_alpha_;
-    double beta1_;
-    double beta2_;
-    double epsilon_;
-    double beta1_t_;
-    double beta2_t_;
-    std::list<Momentum> m_;
-    std::list<Momentum> v_;
+    double alpha_;
+    double beta_;
+    std::list<Momentum> h_;
 };
 }  // namespace neural_network
