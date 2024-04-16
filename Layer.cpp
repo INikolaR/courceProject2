@@ -12,6 +12,8 @@ Layer::Layer(Index input_dimension, Index output_dimension, ActivationFunction f
       a_(Eigen::Rand::normal<Matrix>(output_dimension, input_dimension,
                                      engine)),
       b_(Eigen::Rand::normal<Matrix>(output_dimension, 1, engine)) {
+    assert(input_dimension > 0);
+    assert(output_dimension > 0);
 }
 
 Matrix neural_network::Layer::evaluate(const Matrix &input) const {

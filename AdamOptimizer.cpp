@@ -8,10 +8,18 @@ AdamOptimizer::AdamOptimizer(double start_alpha, double beta1, double beta2,
       epsilon_(epsilon),
       beta1_t_(beta1_),
       beta2_t_(beta2_) {
+    assert(start_alpha_ > 0);
+    assert(beta1_ > 0);
+    assert(beta2_ > 0);
+    assert(epsilon_ > 0);
 }
 void AdamOptimizer::operator()(std::list<Layer> *layers, const LossFunction &l,
                                const std::vector<TrainUnit> &dataset,
                                int size_of_batch, int n_of_epochs) {
+    assert(layers != nullptr);
+    assert(dataset.size() > 0);
+    assert(size_of_batch > 0);
+    assert(n_of_epochs > 0);
     m_.clear();
     v_.clear();
     for (const auto &layer : *layers) {

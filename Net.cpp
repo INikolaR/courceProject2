@@ -31,6 +31,7 @@ const LossFunction Net::Euclid = LossFunction(
 
 Net::Net(std::initializer_list<int> k,
          std::initializer_list<ActivationFunction> f) {
+    assert(k.size() == f.size() - 1);
     auto curr_size = k.begin();
     auto prev_size = curr_size++;
     auto activation_function = f.begin();
@@ -64,6 +65,7 @@ void Net::fit(const std::vector<TrainUnit> &dataset, const LossFunction &l,
 
 double Net::getLoss(const std::vector<TrainUnit> &dataset,
                     const LossFunction &l) const {
+    assert(dataset.size() > 0);
     double loss = 0;
     for (int i = 0; i < dataset.size(); ++i) {
         loss += l.dist(predict(dataset[i].x), dataset[i].y);

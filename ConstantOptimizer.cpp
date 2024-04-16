@@ -1,10 +1,15 @@
 #include "ConstantOptimizer.h"
 namespace neural_network {
 ConstantOptimizer::ConstantOptimizer(double alpha) : alpha_(alpha) {
+    assert(alpha_ > 0);
 }
 void ConstantOptimizer::operator()(std::list<Layer> *layers, const LossFunction &l,
                                 const std::vector<TrainUnit> &dataset,
                                 int size_of_batch, int n_of_epochs) {
+    assert(layers != nullptr);
+    assert(dataset.size() > 0);
+    assert(size_of_batch > 0);
+    assert(n_of_epochs > 0);
     std::vector<ConstTrainUnitIterator> borders(0);
     for (auto it = dataset.begin(); it < dataset.end(); it += size_of_batch) {
         borders.emplace_back(it);

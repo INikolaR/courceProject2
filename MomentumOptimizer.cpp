@@ -8,6 +8,10 @@ void MomentumOptimizer::operator()(std::list<Layer> *layers,
                                    const LossFunction &l,
                                    const std::vector<TrainUnit> &dataset,
                                    int size_of_batch, int n_of_epochs) {
+    assert(layers != nullptr);
+    assert(dataset.size() > 0);
+    assert(size_of_batch > 0);
+    assert(n_of_epochs > 0);
     h_.clear();
     for (const auto &layer : *layers) {
         h_.push_back({Matrix::Zero(layer.getInputSize(), layer.getOutputSize()),
