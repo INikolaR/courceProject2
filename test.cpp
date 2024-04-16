@@ -19,9 +19,6 @@ int reverse_int(int i) {
 }
 
 void run_all_tests() {
-    //    test_echo();
-    //    test_echo_vector();
-    //    test_square();
     test_mnist();
 }
 
@@ -187,7 +184,8 @@ void test_mnist() {
 
     std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid ->10 "
                  "| Using batches of 6 elements during 10 epochs\n";
-    std::cout << " Using momentum with params: step_length = 0.3, momentum = 0.9\n ";
+    std::cout
+        << " Using momentum with params: step_length = 0.3, momentum = 0.9\n ";
     Net net2{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
 
     begin = std::chrono::steady_clock::now();
