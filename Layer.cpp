@@ -7,7 +7,7 @@
 namespace neural_network {
 std::mt19937 Layer::engine = std::mt19937(42345);
 
-Layer::Layer(int input_dimension, int output_dimension, ActivationFunction f)
+Layer::Layer(Index input_dimension, Index output_dimension, ActivationFunction f)
     : f_(f),
       a_(Eigen::Rand::normal<Matrix>(output_dimension, input_dimension,
                                      engine)),
@@ -34,10 +34,6 @@ Matrix neural_network::Layer::getGradA(const Matrix &u, const Matrix &x) {
                           u.row(i).transpose()) *
                          x.col(i).transpose();
     }
-//    std::cout << "A:\n";
-//    std::cout << result_grad_a << std::endl;
-//    std::cout << "A/n:\n";
-//    std::cout << result_grad_a / u.rows() << std::endl;
     return result_grad_a / u.rows();
 }
 

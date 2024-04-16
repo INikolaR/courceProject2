@@ -41,6 +41,14 @@ Net::Net(std::initializer_list<int> k,
     }
 }
 
+Net::Net(const Layer &layer) {
+    layers_.emplace_back(layer);
+}
+
+void Net::addLayer(int new_result_size, const ActivationFunction &f) {
+    layers_.emplace_back(Layer(getOutputSize(), new_result_size, f));
+}
+
 Matrix Net::predict(const neural_network::Matrix &x) const {
     Matrix z = x;
     for (const auto &l : layers_) {

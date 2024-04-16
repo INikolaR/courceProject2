@@ -12,7 +12,7 @@ class Layer {
 public:
     static std::mt19937 engine;
 
-    Layer(int input_dimension, int output_dimension, ActivationFunction f);
+    Layer(Index input_dimension, Index output_dimension, ActivationFunction f);
     Matrix evaluate(const Matrix& input) const;
     Matrix getGradA(const Matrix& u, const Matrix& x);
     Matrix getGradB(const Matrix& u, const Matrix& x);
