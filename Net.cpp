@@ -6,28 +6,18 @@
 #include "ActivationFunction.h"
 
 namespace neural_network {
-const ActivationFunction Net::ReLU = ActivationFunction(
-    [](double x) { return (x > 0) * x; }, [](double x) { return (x > 0); });
-const ActivationFunction Net::LeakyReLU = ActivationFunction(
-    [](double x) { return (x > 0) * (1 - LeakyReluA) * x + LeakyReluA * x; },
-    [](double x) { return (x > 0) * (1 - LeakyReluA) + LeakyReluA; });
-const ActivationFunction Net::Sigmoid =
-    ActivationFunction([](double x) { return 1 / (1 + exp(-x)); },
-                       [](double x) {
-                           double s = 1 / (1 + exp(-x));
-                           return s * (1 - s);
-                       });
-
-const LossFunction Net::Euclid = LossFunction(
-    [](const Matrix &x, const Matrix &y) {
-        Matrix d = x - y;
-        double dist = 0;
-        for (int i = 0; i < d.cols(); ++i) {
-            dist += (d.col(i).transpose() * d.col(i))(0, 0);
-        }
-        return dist;
-    },
-    [](const Matrix &x, const Matrix &y) { return 2 * (x - y).transpose(); });
+ActivationFunction Net::ReLU() {
+    return ActivationFunction::ReLU();
+}
+ActivationFunction Net::LeakyReLU() {
+    return ActivationFunction::LeakyReLU();
+}
+ActivationFunction Net::Sigmoid() {
+    return ActivationFunction::Sigmoid();
+}
+LossFunction Net::Euclid() {
+    return LossFunction::Euclid();
+}
 
 Net::Net(std::initializer_list<int> k,
          std::initializer_list<ActivationFunction> f) {

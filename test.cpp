@@ -24,13 +24,13 @@ void run_all_tests() {
 
 void test_echo() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    Net net{{1, 10, 1}, {Net::LeakyReLU, Net::LeakyReLU}};
+    Net net{{1, 10, 1}, {Net::LeakyReLU(), Net::LeakyReLU()}};
     std::vector<TrainUnit> dataset = {
         {Matrix{{1}}, Matrix{{1}}}, {Matrix{{2}}, Matrix{{2}}},
         {Matrix{{3}}, Matrix{{3}}}, {Matrix{{4}}, Matrix{{4}}},
         {Matrix{{5}}, Matrix{{5}}}, {Matrix{{6}}, Matrix{{6}}},
         {Matrix{{7}}, Matrix{{7}}}, {Matrix{{8}}, Matrix{{8}}}};
-    net.fit(dataset, Net::Euclid, 1, 100, Optimizer(ConstantOptimizer(0.01)));
+    net.fit(dataset, Net::Euclid(), 1, 100, Optimizer(ConstantOptimizer(0.01)));
     for (double i = 0; i < 12; ++i) {
         std::cout << i << " -> " << net.predict(Matrix{{i}}) << "\n";
     }
@@ -38,14 +38,14 @@ void test_echo() {
 
 void test_echo_vector() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    Net net{{2, 10, 10, 2}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}};
+    Net net{{2, 10, 10, 2}, {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
     std::vector<TrainUnit> dataset = {{Matrix{{1}, {0}}, Matrix{{1}, {0}}},
                                       {Matrix{{0}, {1}}, Matrix{{0}, {1}}},
                                       {Matrix{{1}, {1}}, Matrix{{1}, {1}}},
                                       {Matrix{{0}, {0}}, Matrix{{0}, {0}}}};
-    net.fit(dataset, Net::Euclid, 10, 20,
+    net.fit(dataset, Net::Euclid(), 10, 20,
             Optimizer(AdamOptimizer(0.05, 0.9, 0.999, 1e-8)));
-    std::cout << "MSE = " << net.getLoss(dataset, Net::Euclid)
+    std::cout << "MSE = " << net.getLoss(dataset, Net::Euclid())
               << "\nFor example:\n";
     for (size_t i = 0; i < dataset.size(); ++i) {
         std::cout << dataset[i].x << "\n->\n"
@@ -56,15 +56,15 @@ void test_echo_vector() {
 void test_square() {
     std::cout
         << "SQUARE TEST: trying to return x^2 if x is in input (x is scalar)\n";
-    Net net{{1, 20, 20, 1}, {Net::LeakyReLU, Net::LeakyReLU, Net::LeakyReLU}};
+    Net net{{1, 20, 20, 1}, {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
     std::vector<TrainUnit> dataset = {
         {Matrix{{1}}, Matrix{{1}}},  {Matrix{{2}}, Matrix{{4}}},
         {Matrix{{3}}, Matrix{{9}}},  {Matrix{{4}}, Matrix{{16}}},
         {Matrix{{5}}, Matrix{{25}}}, {Matrix{{6}}, Matrix{{36}}},
         {Matrix{{7}}, Matrix{{49}}}, {Matrix{{8}}, Matrix{{64}}}};
-    net.fit(dataset, Net::Euclid, 10, 1000,
+    net.fit(dataset, Net::Euclid(), 10, 1000,
             Optimizer::Adam(0.05, 0.9, 0.999, 1e-8));
-    std::cout << net.getLoss(dataset, Net::Euclid) << "\n";
+    std::cout << net.getLoss(dataset, Net::Euclid()) << "\n";
     for (double i = 0; i < 12; ++i) {
         std::cout << i << " -> " << net.predict(Matrix{{i}}) << "\n";
     }
@@ -167,29 +167,29 @@ void test_mnist() {
     std::cout << "TEST 1 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> "
                  "10 | Using batches of 60 elements during 10 epochs\n ";
     std::cout << "Using constant step length = 0.3\n";
-    Net net1{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+    Net net1{{784, 256, 10}, {Net::Sigmoid(), Net::Sigmoid()}};
 
     begin = std::chrono::steady_clock::now();
-    net1.fit(train, Net::Euclid, 60, 10, Optimizer::Constant(0.3));
+    net1.fit(train, Net::Euclid(), 60, 10, Optimizer::Constant(0.3));
     end = std::chrono::steady_clock::now();
 
     std::cout
         << "Time: "
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
         << "s\n";
-    std::cout << "MSE on train: " << net1.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "MSE on train: " << net1.getLoss(train, Net::Euclid()) << "\n";
     std::cout << "Accuracy on train: " << net1.accuracy(train) * 100 << "%\n";
-    std::cout << "MSE on test: " << net1.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "MSE on test: " << net1.getLoss(test, Net::Euclid()) << "\n";
     std::cout << "Accuracy on test: " << net1.accuracy(test) * 100 << "%\n";
 
     std::cout << "TEST 2 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid ->10 "
                  "| Using batches of 6 elements during 10 epochs\n";
     std::cout
         << " Using momentum with params: step_length = 0.3, momentum = 0.9\n ";
-    Net net2{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+    Net net2{{784, 256, 10}, {Net::Sigmoid(), Net::Sigmoid()}};
 
     begin = std::chrono::steady_clock::now();
-    net2.fit(train, Net::Euclid, 6, 10, Optimizer::Momentum(0.3, 0.9));
+    net2.fit(train, Net::Euclid(), 6, 10, Optimizer::Momentum(0.3, 0.9));
     end = std::chrono::steady_clock::now();
 
     std::cout
@@ -197,19 +197,19 @@ void test_mnist() {
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
         << "s\n";
 
-    std::cout << "MSE on train: " << net2.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "MSE on train: " << net2.getLoss(train, Net::Euclid()) << "\n";
     std::cout << "Accuracy on train: " << net2.accuracy(train) * 100 << "%\n";
-    std::cout << "MSE on test: " << net2.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "MSE on test: " << net2.getLoss(test, Net::Euclid()) << "\n";
     std::cout << "Accuracy on test: " << net2.accuracy(test) * 100 << "%\n";
 
     std::cout << "TEST 3 | Architecture: 784 -> Sigmoid -> 256 -> Sigmoid -> "
                  "10 | Using batches of 6 elements during 10 epochs\n";
     std::cout << "Using Adam optimizer with params: start_step = 0.003, beta1 "
                  "= 0.9, beta2 = 0.999, epsilon = 1e-8\n";
-    Net net3{{784, 256, 10}, {Net::Sigmoid, Net::Sigmoid}};
+    Net net3{{784, 256, 10}, {Net::Sigmoid(), Net::Sigmoid()}};
 
     begin = std::chrono::steady_clock::now();
-    net3.fit(train, Net::Euclid, 6, 20,
+    net3.fit(train, Net::Euclid(), 6, 20,
              Optimizer::Adam(0.005, 0.9, 0.999, 1e-8));
     end = std::chrono::steady_clock::now();
 
@@ -217,9 +217,9 @@ void test_mnist() {
         << "Time: "
         << std::chrono::duration_cast<std::chrono::seconds>(end - begin).count()
         << "s\n";
-    std::cout << "MSE on train: " << net3.getLoss(train, Net::Euclid) << "\n";
+    std::cout << "MSE on train: " << net3.getLoss(train, Net::Euclid()) << "\n";
     std::cout << "Accuracy on train: " << net3.accuracy(train) * 100 << "%\n";
-    std::cout << "MSE on test: " << net3.getLoss(test, Net::Euclid) << "\n";
+    std::cout << "MSE on test: " << net3.getLoss(test, Net::Euclid()) << "\n";
     std::cout << "Accuracy on test: " << net3.accuracy(test) * 100 << "%\n";
 }
 }  // namespace neural_network

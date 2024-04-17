@@ -19,15 +19,14 @@ class Net {
     using ConstElemIterator = std::vector<TrainUnit>::const_iterator;
 
 public:
-    const static ActivationFunction ReLU;
-    const static ActivationFunction LeakyReLU;
-    const static ActivationFunction Sigmoid;
-
-    const static LossFunction Euclid;
+    static ActivationFunction ReLU();
+    static ActivationFunction LeakyReLU();
+    static ActivationFunction Sigmoid();
+    static LossFunction Euclid();
     Net(std::initializer_list<int> k,
         std::initializer_list<ActivationFunction> f);
-    Net(const Layer& layer);
-    void addLayer(int new_result_size, const ActivationFunction& f);
+    Net(const Layer &layer);
+    void addLayer(int new_result_size, const ActivationFunction &f);
     Matrix predict(const Matrix &x) const;
     void fit(const std::vector<TrainUnit> &dataset, const LossFunction &l,
              int size_of_batch, int n_of_epochs, Optimizer optimizer);
@@ -39,10 +38,6 @@ public:
 
 private:
     int get_index_max(Vector &v) const;
-
-    constexpr static double StartStep = 0.001;
-    constexpr static double EpsilonMSE = 0.0001;
-    constexpr static double LeakyReluA = 0.01;
 
     std::list<Layer> layers_;
 };

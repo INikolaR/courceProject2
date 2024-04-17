@@ -1,17 +1,15 @@
 #pragma once
 
-#include <cstdio>
 #include <Eigen/Dense>
 #include <random>
 
 #include "ActivationFunction.h"
 #include "CustomTypes.h"
+#include "Random.h"
 
 namespace neural_network {
 class Layer {
 public:
-    static std::mt19937 engine;
-
     Layer(Index input_dimension, Index output_dimension, ActivationFunction f);
     Matrix evaluate(const Matrix& input) const;
     Matrix getGradA(const Matrix& u, const Matrix& x);
@@ -23,8 +21,9 @@ public:
     Index getOutputSize() const;
 
 private:
+    ActivationFunction f_;
+    Random rnd_;
     Matrix a_;
     Vector b_;
-    ActivationFunction f_;
 };
 }  // namespace neural_network
