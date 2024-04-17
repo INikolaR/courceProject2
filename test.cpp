@@ -18,6 +18,28 @@ int reverse_int(int i) {
            (static_cast<int>(c3) << 8) + c4;
 }
 
+int read_reversed_int(std::basic_ifstream<char>& reader) {
+    int to_be_read = 0;
+    reader.read(reinterpret_cast<char*>(&to_be_read), sizeof(int));
+    return reverse_int(to_be_read);
+}
+
+TrainUnit read_mnist_train_unit(std::basic_ifstream<char>& image_reader, std::basic_ifstream<char>& label_reader, int image_size) {
+    unsigned char image[image_size];
+    unsigned char label = 0;
+    image_reader.read(reinterpret_cast<char*>(image), image_size);
+    double array_image[image_size];
+    for (int j = 0; j < image_size; ++j) {
+        array_image[j] = static_cast<double>(image[j]) / 255.0;
+    }
+    Vector x = Eigen::Map<Vector>(array_image, image_size);
+    label_reader.read(reinterpret_cast<char*>(&label), 1);
+    double array_label[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    array_label[static_cast<unsigned int>(label)] = 1;
+    Vector y = Eigen::Map<Vector>(array_label, 10);
+    return TrainUnit{std::move(x), std::move(y)};
+}
+
 void run_all_tests() {
     test_mnist();
 }
@@ -74,7 +96,6 @@ void test_square() {
 std::vector<TrainUnit> parseMNISTDataset(
     const std::string& path_to_images_file,
     const std::string& path_to_labels_file) {
-    const int size_of_mnist_image = 784;
     std::ifstream file_images(path_to_images_file,
                               std::ios::binary | std::ifstream::in);
 
@@ -83,71 +104,38 @@ std::vector<TrainUnit> parseMNISTDataset(
         throw std::runtime_error("Cannot open image file!");
     }
 
-    int images_magic_number = 0;
+    int images_magic_number = read_reversed_int(file_images);
     const int expected_images_magic_number = 2051;
-    file_images.read(reinterpret_cast<char*>(&images_magic_number),
-                     sizeof(images_magic_number));
-    images_magic_number = reverse_int(images_magic_number);
     if (images_magic_number != expected_images_magic_number) {
         throw std::runtime_error("Bad MNIST image file!");
     }
-    int n_rows = 0;
-    int n_cols = 0;
-    int number_of_images = 0;
 
-    file_images.read(reinterpret_cast<char*>(&number_of_images),
-                     sizeof(number_of_images));
-    number_of_images = reverse_int(number_of_images);
-    file_images.read(reinterpret_cast<char*>(&n_rows), sizeof(n_rows));
-    n_rows = reverse_int(n_rows);
-    file_images.read(reinterpret_cast<char*>(&n_cols), sizeof(n_cols));
-    n_cols = reverse_int(n_cols);
+    int number_of_images = read_reversed_int(file_images);
+    int n_rows = read_reversed_int(file_images);
+    int n_cols = read_reversed_int(file_images);
+    int size_of_mnist_image = n_rows * n_cols;
 
     std::ifstream file_labels(path_to_labels_file, std::ios::binary);
     if (!file_labels.is_open()) {
-        file_images.close();
-        file_labels.close();
         throw std::runtime_error("Cannot open label file!");
     }
 
-    int labels_magic_number = 0;
+    int labels_magic_number = read_reversed_int(file_labels);
     const int expected_labels_magic_number = 2049;
-    file_labels.read(reinterpret_cast<char*>(&labels_magic_number),
-                     sizeof(labels_magic_number));
-    labels_magic_number = reverse_int(labels_magic_number);
     if (labels_magic_number != expected_labels_magic_number) {
-        file_images.close();
-        file_labels.close();
         throw std::runtime_error("Bad MNIST label file!");
     }
 
-    int number_of_labels = 0;
-    file_labels.read(reinterpret_cast<char*>(&number_of_labels),
-                     sizeof(number_of_labels));
-    number_of_labels = reverse_int(number_of_labels);
+    int number_of_labels = read_reversed_int(file_labels);
 
     if (number_of_labels != number_of_images) {
-        file_images.close();
-        file_labels.close();
         throw std::runtime_error(
             "Different number of rows in images and labels!");
     }
 
     std::vector<TrainUnit> dataset(0);
-    unsigned char image[size_of_mnist_image];
-    unsigned char label = 0;
     for (int i = 0; i < number_of_labels; i++) {
-        file_images.read(reinterpret_cast<char*>(image), size_of_mnist_image);
-        double array_image[size_of_mnist_image];
-        for (int j = 0; j < size_of_mnist_image; ++j) {
-            array_image[j] = static_cast<double>(image[j]) / 255.0;
-        }
-        Vector x = Eigen::Map<Vector>(array_image, size_of_mnist_image);
-        file_labels.read(reinterpret_cast<char*>(&label), 1);
-        double array_label[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        array_label[static_cast<unsigned int>(label)] = 1;
-        Vector y = Eigen::Map<Vector>(array_label, 10);
-        dataset.emplace_back(TrainUnit{x, y});
+        dataset.push_back(read_mnist_train_unit(file_images, file_labels, size_of_mnist_image));
     }
     return dataset;
 }

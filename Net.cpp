@@ -1,6 +1,5 @@
 #include "Net.h"
 
-#include <cmath>
 #include <iostream>
 
 #include "ActivationFunction.h"
@@ -67,6 +66,7 @@ Index Net::getInputSize() const {
     assert(layers_.size() > 0);
     return layers_.front().getInputSize();
 }
+
 Index Net::getOutputSize() const {
     assert(layers_.size() > 0);
     return layers_.back().getOutputSize();
@@ -81,6 +81,7 @@ double Net::accuracy(const std::vector<TrainUnit> &dataset) const {
     }
     return successful_guess_count / dataset.size();
 }
+
 int Net::get_index_max(Vector &v) const {
     double max = v(0);
     int max_index = 0;
