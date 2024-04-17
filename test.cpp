@@ -38,25 +38,26 @@ void test_echo() {
 
 void test_echo_vector() {
     std::cout << "ECHO TEST: just trying to return the input\n";
-    Net net{{2, 10, 10, 2}, {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
+    Net net{{2, 10, 10, 2},
+            {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
     std::vector<TrainUnit> dataset = {{Matrix{{1}, {0}}, Matrix{{1}, {0}}},
                                       {Matrix{{0}, {1}}, Matrix{{0}, {1}}},
                                       {Matrix{{1}, {1}}, Matrix{{1}, {1}}},
                                       {Matrix{{0}, {0}}, Matrix{{0}, {0}}}};
     net.fit(dataset, Net::Euclid(), 10, 20,
-            Optimizer(AdamOptimizer(0.05, 0.9, 0.999, 1e-8)));
+            Optimizer::Adam(0.05, 0.9, 0.999, 1e-8));
     std::cout << "MSE = " << net.getLoss(dataset, Net::Euclid())
               << "\nFor example:\n";
-    for (size_t i = 0; i < dataset.size(); ++i) {
-        std::cout << dataset[i].x << "\n->\n"
-                  << net.predict(dataset[i].x) << "\n";
+    for (const auto& elem : dataset) {
+        std::cout << elem.x << "\n->\n" << net.predict(elem.x) << "\n";
     }
 }
 
 void test_square() {
     std::cout
         << "SQUARE TEST: trying to return x^2 if x is in input (x is scalar)\n";
-    Net net{{1, 20, 20, 1}, {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
+    Net net{{1, 20, 20, 1},
+            {Net::LeakyReLU(), Net::LeakyReLU(), Net::LeakyReLU()}};
     std::vector<TrainUnit> dataset = {
         {Matrix{{1}}, Matrix{{1}}},  {Matrix{{2}}, Matrix{{4}}},
         {Matrix{{3}}, Matrix{{9}}},  {Matrix{{4}}, Matrix{{16}}},

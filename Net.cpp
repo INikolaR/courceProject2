@@ -64,9 +64,11 @@ double Net::getLoss(const std::vector<TrainUnit> &dataset,
 }
 
 Index Net::getInputSize() const {
+    assert(layers_.size() > 0);
     return layers_.front().getInputSize();
 }
 Index Net::getOutputSize() const {
+    assert(layers_.size() > 0);
     return layers_.back().getOutputSize();
 }
 

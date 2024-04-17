@@ -54,10 +54,10 @@ void MomentumOptimizer::train_one_batch(std::list<Layer> *layers,
         x = layer.evaluate(x);
     }
     u = l.derivativeDist(x, y);
-    std::list<Matrix>::reverse_iterator it_x = mid_values.rbegin();
-    std::list<Momentum>::reverse_iterator it_h = h_.rbegin();
-    for (std::list<Layer>::reverse_iterator layer = layers->rbegin();
-         layer != layers->rend(); ++layer, ++it_x, ++it_h) {
+    auto it_x = mid_values.rbegin();
+    auto it_h = h_.rbegin();
+    for (auto layer = layers->rbegin(); layer != layers->rend();
+         ++layer, ++it_x, ++it_h) {
         Matrix grad_a = layer->getGradA(u, *it_x);
         Vector grad_b = layer->getGradB(u, *it_x);
         u = layer->getNextU(u, *it_x);
